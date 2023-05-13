@@ -59,46 +59,165 @@ class DataTableHistoryState extends State<DataTableHistory> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Local Storage'),
-      ),
-      body: _imageFiles.isEmpty
-          ? Center(child: CircularProgressIndicator())
-          : Table(
-              border: TableBorder.all(),
-              columnWidths: {
-                0: FlexColumnWidth(2),
-                1: FlexColumnWidth(3),
-                2: FlexColumnWidth(3),
-              },
-              children: [
-                TableRow(
-                  children: [
-                    TableCell(child: Text('Timestamp')),
-                    TableCell(child: Text('Image')),
-                    TableCell(child: Text('Prediction')),
-                  ],
+      key: _scaffoldKey,
+      body: Column(children: [
+        Container(
+          height: MediaQuery.of(context).size.height,
+          child: Stack(
+            children: <Widget>[
+              Positioned(
+                top: 20,
+                child: Container(
+                  color: Colors.white,
+                  width: MediaQuery.of(context).size.width,
+                  height: 100.0,
+                  child: Center(
+                    child: Text(
+                      "History",
+                      style: GoogleFonts.roboto(
+                          color: Colors.black,
+                          fontSize: 25.0,
+                          fontWeight: FontWeight.bold),
+                    ),
+                  ),
                 ),
-                ...List.generate(
-                  _imageFiles.length,
-                  (index) => TableRow(
+              ),
+              Positioned(
+                top: 100,
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Color(0xFF88BF3B),
+                          Color(0xFF178F3E),
+                        ]),
+                    borderRadius: BorderRadius.only(
+                        topRight: Radius.circular(40),
+                        topLeft: Radius.circular(40)),
+                  ),
+                  width: MediaQuery.of(context).size.width,
+                  height: MediaQuery.of(context).size.height,
+                  child: Column(
                     children: [
-                      TableCell(child: Text(_timestamps[index])),
-                      TableCell(
-                          child: Image.file(
-                        _imageFiles[index],
-                        width: 80,
-                        height: 80,
-                      )),
-                      TableCell(child: Text(_predictionTexts[index])),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Container(
+                            padding: EdgeInsets.only(left: 5, top: 10),
+                            child: IconButton(
+                              color: Colors.white,
+                              icon: Icon(Icons.arrow_back_ios),
+                              iconSize: 20,
+                              onPressed: () {
+                                Navigator.push(context,
+                                    MaterialPageRoute(builder: (BuildContext) {
+                                  return dashboardScreen();
+                                }));
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                      _imageFiles.isEmpty
+                          ? Center(child: CircularProgressIndicator())
+                          : Container(
+                              margin:
+                                  EdgeInsets.only(top: 30, left: 20, right: 20),
+                              child: Table(
+                                border: TableBorder.all(),
+                                columnWidths: {
+                                  0: FlexColumnWidth(3),
+                                  1: FlexColumnWidth(3),
+                                  2: FlexColumnWidth(2),
+                                },
+                                children: [
+                                  TableRow(
+                                    children: [
+                                      TableCell(
+                                          child: Text(
+                                        'Date',
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                          fontSize: 20,
+                                        ),
+                                      )),
+                                      TableCell(
+                                          child: Text(
+                                        'Image',
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                          fontSize: 20,
+                                        ),
+                                      )),
+                                      TableCell(
+                                          child: Text(
+                                        'Prediction',
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                          fontSize: 20,
+                                        ),
+                                      )),
+                                    ],
+                                  ),
+                                  ...List.generate(
+                                    _imageFiles.length,
+                                    (index) => TableRow(
+                                      children: [
+                                        TableCell(
+                                            child: Text(
+                                          _timestamps[index],
+                                          textAlign: TextAlign.center,
+                                        )),
+                                        TableCell(
+                                            child: Image.file(
+                                          _imageFiles[index],
+                                          width: 80,
+                                          height: 80,
+                                        )),
+                                        TableCell(
+                                            child: Text(
+                                          _predictionTexts[index],
+                                          textAlign: TextAlign.center,
+                                        )),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
                     ],
                   ),
                 ),
-              ],
-            ),
+              ),
+              Positioned(
+                top: 60.0,
+                left: 20.0,
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 20.0),
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(35),
+                        border: Border.all(color: Colors.white, width: 2.0),
+                        color: Colors.white),
+                    child: Image.asset(
+                      'assets/logo/logo.png',
+                      width: 80,
+                      height: 80,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ]),
     );
   }
 }
+
+
 
 /*
 
