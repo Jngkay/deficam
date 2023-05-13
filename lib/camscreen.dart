@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart';
@@ -29,6 +30,7 @@ class _HomeState extends State<Home> {
   late File _image;
   late List _output;
   final picker = ImagePicker();
+  String _predictedClass = '';
 
   @override
   void initState() {
@@ -57,7 +59,7 @@ class _HomeState extends State<Home> {
       _loading = false;
     });
 
-    final appDir = await getApplicationDocumentsDirectory();
+    /*final appDir = await getApplicationDocumentsDirectory();
     final fileName = basename(image.path);
     final predFile = File('${appDir.path}/${fileName.split('.').first}.txt');
     final predText =
@@ -69,7 +71,7 @@ class _HomeState extends State<Home> {
         .ref()
         .child('predictions/${fileName.split('.').first}.txt');
     final predUploadTask = predStorageRef.putFile(predFile);
-    await predUploadTask.whenComplete(() => print('Prediction uploaded'));
+    await predUploadTask.whenComplete(() => print('Prediction uploaded'));*/
   }
 
   loadModel() async {
@@ -83,14 +85,16 @@ class _HomeState extends State<Home> {
     setState(() {
       _image = File(image.path);
     });
-    final appDir = await getApplicationDocumentsDirectory();
+
+    classifyImage(_image);
+    /*  final appDir = await getApplicationDocumentsDirectory();
     final fileName = basename(image.path);
     final savedImage = await _image.copy('${appDir.path}/$fileName');
-    classifyImage(savedImage);
+    
     // Upload image and prediction to Firebase storage
     final storageRef = FirebaseStorage.instance.ref().child('images/$fileName');
     final uploadTask = storageRef.putFile(savedImage);
-    await uploadTask.whenComplete(() => print('Image uploaded'));
+    await uploadTask.whenComplete(() => print('Image uploaded'));*/
   }
 
   pickGalleryImage() async {
@@ -100,6 +104,53 @@ class _HomeState extends State<Home> {
       _image = File(image.path);
     });
     classifyImage(_image);
+  }
+
+  void _saveImageAndPrediction() async {
+    final directory = await getApplicationDocumentsDirectory();
+    final timestamp = DateTime.now().millisecondsSinceEpoch;
+    final fileName = 'image_$timestamp.jpg';
+    final localFile = await _image.copy('${directory.path}/$fileName');
+    print('Image saved locally: ${localFile.path}');
+    print('Predicted class: ${_output[0]['label']}');
+
+    // Save predicted class to a text file
+    final predictionFileName =
+        '${fileName.replaceAll('.jpg', '')}_prediction.txt';
+    final predictionFile =
+        await File('${directory.path}/$predictionFileName').create();
+    await predictionFile.writeAsString(_output[0]['label']);
+
+    if (await localFile.exists() && await predictionFile.exists()) {
+      print('Files saved successfully');
+    } else {
+      print('File save failed');
+    }
+  }
+
+  void _saveToFirebase() async {
+    final appDir = await getApplicationDocumentsDirectory();
+    final fileName = basename(_image.path);
+    final predFile = File('${appDir.path}/${fileName.split('.').first}.txt');
+    final savedImage = await _image.copy('${appDir.path}/$fileName');
+    final predText =
+        'The plant is suffering from a lack of ${_output[0]['label']}';
+    await predFile.writeAsString(predText);
+
+    // Upload prediction to Firebase storage
+    final predStorageRef = FirebaseStorage.instance
+        .ref()
+        .child('predictions/${fileName.split('.').first}.txt');
+    final predUploadTask = predStorageRef.putFile(predFile);
+    await predUploadTask.whenComplete(() => print('Prediction uploaded'));
+
+    // Upload image and prediction to Firebase storage
+    final storageRef = FirebaseStorage.instance.ref().child('images/$fileName');
+    final uploadTask = storageRef.putFile(savedImage);
+    await uploadTask.whenComplete(() => print('Image uploaded'));
+
+    // Print a message to indicate that the image and prediction were saved
+    print('Image and prediction saved to Firebase');
   }
 
   @override
@@ -193,6 +244,20 @@ class _HomeState extends State<Home> {
                             'Capture using gallery picker',
                             style: TextStyle(color: Colors.white, fontSize: 16),
                           )),
+                    ),
+                    SizedBox(
+                      height: 50,
+                    ),
+                    ElevatedButton(
+                      onPressed: _saveImageAndPrediction,
+                      child: Text('Save image and prediction'),
+                    ),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    ElevatedButton(
+                      onPressed: _saveToFirebase,
+                      child: Text('Save image and prediction online'),
                     ),
                   ],
                 ),
