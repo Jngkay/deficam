@@ -3,22 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:google_fonts/google_fonts.dart';
-
-class Item {
-  Item({
-    required this.id,
-    required this.time,
-    required this.ndclassify,
-    required this.ndfoliar,
-    required this.isSelected,
-  });
-
-  int id;
-  int time;
-  String ndclassify;
-  String ndfoliar;
-  bool isSelected;
-}
+import 'dart:io';
+import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:deficam/camscreen.dart';
+import 'package:intl/intl.dart';
 
 class DataTableHistory extends StatefulWidget {
   @override
@@ -29,9 +18,89 @@ class DataTableHistory extends StatefulWidget {
 
 class DataTableHistoryState extends State<DataTableHistory> {
   GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
-  List<Item> _items = [];
-  int _sortColumnIndex = 0;
-  bool _sortAscending = true;
+
+  List<File> _imageFiles = [];
+  List<String> _predictionTexts = [];
+  List<String> _timestamps = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadImagesAndPredictions();
+  }
+
+  Future<void> _loadImagesAndPredictions() async {
+    final appDir = await getApplicationDocumentsDirectory();
+    final files = await appDir.list().toList();
+    final imageFiles = files
+        .where((file) => file.path.endsWith('.jpg'))
+        .map((file) => File(file.path))
+        .toList();
+
+    final predictionFiles =
+        files.where((file) => file.path.endsWith('.txt')).toList();
+    final predictionTexts = await Future.wait(
+      predictionFiles.map((file) async => await File(file.path).readAsString()),
+    );
+    final timestamps = imageFiles.map((file) {
+      final stat = file.statSync();
+      final modifiedDate = DateTime.fromMillisecondsSinceEpoch(
+          stat.modified.millisecondsSinceEpoch);
+      return DateFormat('yyyy-MM-dd hh:mm:ss').format(modifiedDate);
+    }).toList();
+
+    setState(() {
+      _imageFiles = imageFiles;
+      _predictionTexts = predictionTexts;
+      _timestamps = timestamps;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Local Storage'),
+      ),
+      body: _imageFiles.isEmpty
+          ? Center(child: CircularProgressIndicator())
+          : Table(
+              border: TableBorder.all(),
+              columnWidths: {
+                0: FlexColumnWidth(2),
+                1: FlexColumnWidth(3),
+                2: FlexColumnWidth(3),
+              },
+              children: [
+                TableRow(
+                  children: [
+                    TableCell(child: Text('Timestamp')),
+                    TableCell(child: Text('Image')),
+                    TableCell(child: Text('Prediction')),
+                  ],
+                ),
+                ...List.generate(
+                  _imageFiles.length,
+                  (index) => TableRow(
+                    children: [
+                      TableCell(child: Text(_timestamps[index])),
+                      TableCell(
+                          child: Image.file(
+                        _imageFiles[index],
+                        width: 80,
+                        height: 80,
+                      )),
+                      TableCell(child: Text(_predictionTexts[index])),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+    );
+  }
+}
+
+/*
 
   @override
   void initState() {
@@ -319,3 +388,4 @@ class DataTableHistoryState extends State<DataTableHistory> {
     // );
   }
 }
+*/
