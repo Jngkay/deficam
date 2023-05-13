@@ -22,6 +22,8 @@ class DataTableHistoryState extends State<DataTableHistory> {
   List<File> _imageFiles = [];
   List<String> _predictionTexts = [];
   List<String> _timestamps = [];
+  int _rowsPerPage = PaginatedDataTable.defaultRowsPerPage;
+  int _pageIndex = 0;
 
   @override
   void initState() {
@@ -120,9 +122,127 @@ class DataTableHistoryState extends State<DataTableHistory> {
                           ),
                         ],
                       ),
-                      _imageFiles.isEmpty
+                      _imageFiles.isNotEmpty
+                          ? SingleChildScrollView(
+                              child: PaginatedDataTable(
+                                rowsPerPage: _rowsPerPage,
+                                availableRowsPerPage: [10, 25, 50],
+                                onPageChanged: (pageIndex) {
+                                  setState(() {
+                                    _pageIndex = pageIndex;
+                                  });
+                                },
+                                source: ImageDataTableSource(
+                                  imageFiles: _imageFiles,
+                                  predictionTexts: _predictionTexts,
+                                  pageIndex: _pageIndex,
+                                  rowsPerPage: _rowsPerPage,
+                                ),
+                                columns: [
+                                  DataColumn(
+                                      label: Text(
+                                    'Date and Time',
+                                    textAlign: TextAlign.center,
+                                  )),
+                                  DataColumn(
+                                      label: Text(
+                                    'Image',
+                                    textAlign: TextAlign.center,
+                                  )),
+                                  DataColumn(
+                                      label: Text(
+                                    'Prediction',
+                                    textAlign: TextAlign.center,
+                                  )),
+                                ],
+                              ),
+                            )
+                          : Center(
+                              child: CircularProgressIndicator(),
+                            ),
+                    ],
+                  ),
+                ),
+              ),
+              Positioned(
+                top: 60.0,
+                left: 20.0,
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 20.0),
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(35),
+                        border: Border.all(color: Colors.white, width: 2.0),
+                        color: Colors.white),
+                    child: Image.asset(
+                      'assets/logo/logo.png',
+                      width: 80,
+                      height: 80,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ]),
+    );
+  }
+}
+
+class ImageDataTableSource extends DataTableSource {
+  final List<File> imageFiles;
+  final List<String> predictionTexts;
+  final int pageIndex;
+  final int rowsPerPage;
+
+  ImageDataTableSource({
+    required this.imageFiles,
+    required this.predictionTexts,
+    required this.pageIndex,
+    required this.rowsPerPage,
+  });
+
+  @override
+  DataRow? getRow(int index) {
+    if (index >= imageFiles.length) {
+      return null;
+    }
+
+    final imageFile = imageFiles[index];
+    final predictionText = predictionTexts[index];
+    final dateTime =
+        DateFormat('yyyy-MM-dd HH:mm:ss').format(imageFile.lastModifiedSync());
+
+    return DataRow.byIndex(
+      index: index,
+      cells: [
+        DataCell(Text(dateTime)),
+        DataCell(Image.file(
+          imageFile,
+          width: 100,
+          height: 100,
+        )),
+        DataCell(Text(predictionText)),
+      ],
+    );
+  }
+
+  @override
+  int get rowCount => imageFiles.length;
+
+  @override
+  bool get isRowCountApproximate => false;
+
+  @override
+  int get selectedRowCount => 0;
+}
+
+/*
+_imageFiles.isEmpty
                           ? Center(child: CircularProgressIndicator())
                           : Container(
+                              decoration: BoxDecoration(color: Colors.white),
                               margin:
                                   EdgeInsets.only(top: 30, left: 20, right: 20),
                               child: Table(
@@ -187,39 +307,13 @@ class DataTableHistoryState extends State<DataTableHistory> {
                                 ],
                               ),
                             ),
-                    ],
-                  ),
-                ),
-              ),
-              Positioned(
-                top: 60.0,
-                left: 20.0,
-                child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 20.0),
-                  child: DecoratedBox(
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(35),
-                        border: Border.all(color: Colors.white, width: 2.0),
-                        color: Colors.white),
-                    child: Image.asset(
-                      'assets/logo/logo.png',
-                      width: 80,
-                      height: 80,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ]),
-    );
-  }
-}
 
 
 
-/*
+
+
+
+
 
   @override
   void initState() {
