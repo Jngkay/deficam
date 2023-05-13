@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "1088817475893",
+    "project_id": "deficamdb-9914b",
+    "storage_bucket": "deficamdb-9914b.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1088817475893:android:1497aa12453fce51ea1c7c",
+        "android_client_info": {
+          "package_name": "com.example.classify"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1088817475893-2dsquh8vcjfh8ijec0u92f8dspkr9ful.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDT0p2-sFzduuZdGJSkOmXkPiYiT75ne-A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1088817475893-2dsquh8vcjfh8ijec0u92f8dspkr9ful.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
