@@ -224,6 +224,9 @@ class _HomeState extends State<Home> {
                             ),
                           ],
                         ),
+                        SizedBox(
+                          height: 60,
+                        ),
                         Container(
                           child: Column(
                             children: [
@@ -280,6 +283,43 @@ class _HomeState extends State<Home> {
                                 onPressed: _saveToFirebase,
                                 child: Text('Save image and prediction online'),
                               ),
+                              Center(
+                                child: _loading == true
+                                    ? null
+                                    : Container(
+                                        child: Column(
+                                          children: [
+                                            Container(
+                                              height: MediaQuery.of(context)
+                                                      .size
+                                                      .width *
+                                                  0.5,
+                                              width: MediaQuery.of(context)
+                                                      .size
+                                                      .width *
+                                                  0.5,
+                                              child: ClipRRect(
+                                                borderRadius:
+                                                    BorderRadius.circular(30),
+                                                child: Image.file(
+                                                  _image,
+                                                  fit: BoxFit.fill,
+                                                ),
+                                              ),
+                                            ),
+                                            _output.isNotEmpty
+                                                ? Text(
+                                                    'The plant is suffering from a lack of ${_output[0]['label']}',
+                                                  )
+                                                : Container(),
+                                            Divider(
+                                              height: 25,
+                                              thickness: 1,
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                              ),
                             ],
                           ),
                         )
@@ -304,36 +344,6 @@ class _HomeState extends State<Home> {
                       ),
                     ),
                   ),
-                ),
-                Center(
-                  child: _loading == true
-                      ? null
-                      : Container(
-                          child: Column(
-                            children: [
-                              Container(
-                                height: MediaQuery.of(context).size.width * 0.5,
-                                width: MediaQuery.of(context).size.width * 0.5,
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(30),
-                                  child: Image.file(
-                                    _image,
-                                    fit: BoxFit.fill,
-                                  ),
-                                ),
-                              ),
-                              _output.isNotEmpty
-                                  ? Text(
-                                      'The plant is suffering from a lack of ${_output[0]['label']}',
-                                    )
-                                  : Container(),
-                              Divider(
-                                height: 25,
-                                thickness: 1,
-                              ),
-                            ],
-                          ),
-                        ),
                 ),
               ],
             ),
