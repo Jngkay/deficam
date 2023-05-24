@@ -10,6 +10,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:path_provider/path_provider.dart';
+import 'dart:convert';
+import 'package:flutter/services.dart' show rootBundle;
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -56,6 +58,11 @@ class _HomeState extends State<Home> {
       imageMean: 127.5,
       imageStd: 127.5,
     );
+    for (var item in output!) {
+      final className = item['label'] as String;
+      final recommendation = await getRecommendationForClass(className);
+      item['recommendation'] = recommendation;
+    }
     setState(() {
       _output = output!;
       _loading = false;
@@ -74,6 +81,19 @@ class _HomeState extends State<Home> {
         .child('predictions/${fileName.split('.').first}.txt');
     final predUploadTask = predStorageRef.putFile(predFile);
     await predUploadTask.whenComplete(() => print('Prediction uploaded'));*/
+  }
+
+  Future<String> getRecommendationForClass(String className) async {
+    final jsonContent =
+        await rootBundle.loadString('assets/recommendations.json');
+    final recommendations = jsonDecode(jsonContent) as Map<String, dynamic>;
+
+    if (recommendations.containsKey(className)) {
+      final recommendation = recommendations[className] as String;
+      return recommendation;
+    } else {
+      throw Exception('Recommendation not found for class: $className');
+    }
   }
 
   loadModel() async {
@@ -122,6 +142,14 @@ class _HomeState extends State<Home> {
     final predictionFile =
         await File('${directory.path}/$predictionFileName').create();
     await predictionFile.writeAsString(_output[0]['label']);
+
+    final recoFileName =
+        '${fileName.replaceAll('.jpg', '')}_recommendation.txt';
+    final recomendationFile =
+        await File('${directory.path}/$recoFileName').create();
+    await recomendationFile.writeAsString(
+      'Recommendation: ${_output[0]['recommendation']}',
+    );
 
     if (await localFile.exists() && await predictionFile.exists()) {
       print('Files saved successfully');
@@ -279,10 +307,6 @@ class _HomeState extends State<Home> {
                               SizedBox(
                                 height: 20,
                               ),
-                              ElevatedButton(
-                                onPressed: _saveToFirebase,
-                                child: Text('Save image and prediction online'),
-                              ),
                               Center(
                                 child: _loading == true
                                     ? null
@@ -309,7 +333,7 @@ class _HomeState extends State<Home> {
                                             ),
                                             _output.isNotEmpty
                                                 ? Text(
-                                                    'The plant is suffering from a lack of ${_output[0]['label']}',
+                                                    'The plant is suffering from a lack of ${_output[0]['label']} \nRecommendation: ${_output[0]['recommendation']}',
                                                   )
                                                 : Container(),
                                             Divider(
