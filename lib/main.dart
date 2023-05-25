@@ -9,7 +9,12 @@ import 'package:firebase_core/firebase_core.dart';
 
 //List<CameraDescription> cameras = List.empty(growable: true);
 void main() async {
-  // WidgetsFlutterBinding.ensureInitialized();
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+
+  // Check if Firebase is connected.
+  bool connected = Firebase.apps.isNotEmpty;
+  print('Firebase is connected: $connected');
   runApp(const deficamApp());
 }
 

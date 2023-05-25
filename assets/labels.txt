@@ -1,3 +1,3 @@
-0 Nitrogen
-1 Potassium
-2 Healthy
+Nitrogen
+Potassium
+Healthy

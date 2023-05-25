@@ -1,4 +1,5 @@
 import 'package:deficam/dashboardScreen.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
@@ -22,6 +23,7 @@ class DataTableHistoryState extends State<DataTableHistory> {
   List<File> _imageFiles = [];
   List<String> _predictionTexts = [];
   List<String> _timestamps = [];
+  List<String> _recommendationTexts = [];
   int _rowsPerPage = PaginatedDataTable.defaultRowsPerPage;
   int _pageIndex = 0;
 
@@ -32,6 +34,7 @@ class DataTableHistoryState extends State<DataTableHistory> {
   }
 
   Future<void> _loadImagesAndPredictions() async {
+    // try {
     final appDir = await getApplicationDocumentsDirectory();
     final files = await appDir.list().toList();
     final imageFiles = files
@@ -40,9 +43,16 @@ class DataTableHistoryState extends State<DataTableHistory> {
         .toList();
 
     final predictionFiles =
-        files.where((file) => file.path.endsWith('.txt')).toList();
+        files.where((file) => file.path.endsWith('_prediction.txt')).toList();
     final predictionTexts = await Future.wait(
       predictionFiles.map((file) async => await File(file.path).readAsString()),
+    );
+
+    final recoFiles = files
+        .where((file) => file.path.endsWith('_recommendation.txt'))
+        .toList();
+    final recommendationTexts = await Future.wait(
+      recoFiles.map((file) async => await File(file.path).readAsString()),
     );
     final timestamps = imageFiles.map((file) {
       final stat = file.statSync();
@@ -55,7 +65,11 @@ class DataTableHistoryState extends State<DataTableHistory> {
       _imageFiles = imageFiles;
       _predictionTexts = predictionTexts;
       _timestamps = timestamps;
+      _recommendationTexts = recommendationTexts;
     });
+    // } catch (error) {
+    //   print(error);
+    // }
   }
 
   @override
@@ -126,6 +140,7 @@ class DataTableHistoryState extends State<DataTableHistory> {
                           ? SingleChildScrollView(
                               child: PaginatedDataTable(
                                 rowsPerPage: _rowsPerPage,
+                                columnSpacing: 35,
                                 availableRowsPerPage: [10, 25, 50],
                                 onPageChanged: (pageIndex) {
                                   setState(() {
@@ -135,6 +150,7 @@ class DataTableHistoryState extends State<DataTableHistory> {
                                 source: ImageDataTableSource(
                                   imageFiles: _imageFiles,
                                   predictionTexts: _predictionTexts,
+                                  recommendationTexts: _recommendationTexts,
                                   pageIndex: _pageIndex,
                                   rowsPerPage: _rowsPerPage,
                                 ),
@@ -152,6 +168,11 @@ class DataTableHistoryState extends State<DataTableHistory> {
                                   DataColumn(
                                       label: Text(
                                     'Prediction',
+                                    textAlign: TextAlign.center,
+                                  )),
+                                  DataColumn(
+                                      label: Text(
+                                    'Recommendation',
                                     textAlign: TextAlign.center,
                                   )),
                                 ],
@@ -193,6 +214,7 @@ class DataTableHistoryState extends State<DataTableHistory> {
 class ImageDataTableSource extends DataTableSource {
   final List<File> imageFiles;
   final List<String> predictionTexts;
+  final List<String> recommendationTexts;
   final int pageIndex;
   final int rowsPerPage;
 
@@ -201,6 +223,7 @@ class ImageDataTableSource extends DataTableSource {
     required this.predictionTexts,
     required this.pageIndex,
     required this.rowsPerPage,
+    required this.recommendationTexts,
   });
 
   @override
@@ -211,6 +234,7 @@ class ImageDataTableSource extends DataTableSource {
 
     final imageFile = imageFiles[index];
     final predictionText = predictionTexts[index];
+    final recommendationText = recommendationTexts[index];
     final dateTime =
         DateFormat('yyyy-MM-dd HH:mm:ss').format(imageFile.lastModifiedSync());
 
@@ -220,10 +244,11 @@ class ImageDataTableSource extends DataTableSource {
         DataCell(Text(dateTime)),
         DataCell(Image.file(
           imageFile,
-          width: 100,
-          height: 100,
+          width: 50,
+          height: 50,
         )),
         DataCell(Text(predictionText)),
+        DataCell(Text(recommendationText)),
       ],
     );
   }

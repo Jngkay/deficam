@@ -12,6 +12,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:convert';
 import 'package:flutter/services.dart' show rootBundle;
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -21,15 +22,6 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  Future<void> initializeFirebase() async {
-    WidgetsFlutterBinding.ensureInitialized();
-    await Firebase.initializeApp();
-
-    // Check if Firebase is connected.
-    bool connected = Firebase.apps.isNotEmpty;
-    print('Firebase is connected: $connected');
-  }
-
   bool _loading = true;
   late File _image;
   late List _output;
@@ -67,20 +59,6 @@ class _HomeState extends State<Home> {
       _output = output!;
       _loading = false;
     });
-
-    /*final appDir = await getApplicationDocumentsDirectory();
-    final fileName = basename(image.path);
-    final predFile = File('${appDir.path}/${fileName.split('.').first}.txt');
-    final predText =
-        'The plant is suffering from a lack of ${_output[0]['label']}';
-    await predFile.writeAsString(predText);
-
-    // Upload prediction to Firebase storage
-    final predStorageRef = FirebaseStorage.instance
-        .ref()
-        .child('predictions/${fileName.split('.').first}.txt');
-    final predUploadTask = predStorageRef.putFile(predFile);
-    await predUploadTask.whenComplete(() => print('Prediction uploaded'));*/
   }
 
   Future<String> getRecommendationForClass(String className) async {
@@ -132,9 +110,13 @@ class _HomeState extends State<Home> {
     final directory = await getApplicationDocumentsDirectory();
     final timestamp = DateTime.now().millisecondsSinceEpoch;
     final fileName = 'image_$timestamp.jpg';
+    final localFilePath = '${directory.path}/$fileName';
     final localFile = await _image.copy('${directory.path}/$fileName');
     print('Image saved locally: ${localFile.path}');
     print('Predicted class: ${_output[0]['label']}');
+
+    final compressedImage = await compressImage(_image, localFilePath);
+    print('Image compressed and saved locally: ${compressedImage.path}');
 
     // Save predicted class to a text file
     final predictionFileName =
@@ -148,13 +130,29 @@ class _HomeState extends State<Home> {
     final recomendationFile =
         await File('${directory.path}/$recoFileName').create();
     await recomendationFile.writeAsString(
-      'Recommendation: ${_output[0]['recommendation']}',
+      _output[0]['recommendation'],
     );
 
-    if (await localFile.exists() && await predictionFile.exists()) {
+    if (await compressedImage.exists() && await predictionFile.exists()) {
       print('Files saved successfully');
     } else {
       print('File save failed');
+    }
+  }
+
+  Future<File> compressImage(File image, String targetPath) async {
+    final compressedImage = await FlutterImageCompress.compressAndGetFile(
+      image.path,
+      targetPath,
+      quality: 60, // Adjust the quality as needed (0-100)
+      minWidth: 300, // Adjust the width as needed
+      minHeight: 300, // Adjust the height as needed
+    );
+
+    if (compressedImage != null) {
+      return compressedImage;
+    } else {
+      throw Exception('Image compression failed');
     }
   }
 
@@ -187,7 +185,6 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
-    initializeFirebase();
     return Scaffold(
       key: _scaffoldKey,
       body: Column(
@@ -333,7 +330,7 @@ class _HomeState extends State<Home> {
                                             ),
                                             _output.isNotEmpty
                                                 ? Text(
-                                                    'The plant is suffering from a lack of ${_output[0]['label']} \nRecommendation: ${_output[0]['recommendation']}',
+                                                    'Plant Status :  ${_output[0]['label']} \nRecommendation: ${_output[0]['recommendation']}',
                                                   )
                                                 : Container(),
                                             Divider(

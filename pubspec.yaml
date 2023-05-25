@@ -57,6 +57,7 @@ dependencies:
   firebase_analytics: ^1.0.7
   firebase_core_platform_interface: 4.5.1
   firebase_storage: ^10.0.4
+  flutter_image_compress: ^1.0.0
   
 
 
