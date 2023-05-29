@@ -1,5 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:deficam/dashboardScreen.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
@@ -26,6 +28,7 @@ class DataTableHistoryState extends State<DataTableHistory> {
   List<String> _recommendationTexts = [];
   int _rowsPerPage = PaginatedDataTable.defaultRowsPerPage;
   int _pageIndex = 0;
+  int _selectedRowIndex = -1;
 
   @override
   void initState() {
@@ -72,8 +75,72 @@ class DataTableHistoryState extends State<DataTableHistory> {
     // }
   }
 
+  Future<void> _uploadDataAndDeleteLocalCopy() async {
+    final firestore = FirebaseFirestore.instance;
+    final collectionRef = firestore.collection('DeficamClassification');
+
+    if (_selectedRowIndex >= 0 && _selectedRowIndex < _imageFiles.length) {
+      // Get the selected row data
+      final selectedImageFile = _imageFiles[_selectedRowIndex];
+      final selectedPredictionText = _predictionTexts[_selectedRowIndex];
+      final selectedRecommendationText =
+          _recommendationTexts[_selectedRowIndex];
+
+      final imagePath = 'images/${selectedImageFile.path.split('/').last}';
+      final uploadTask = FirebaseStorage.instance
+          .ref()
+          .child(imagePath)
+          .putFile(selectedImageFile);
+      final TaskSnapshot uploadSnapshot = await uploadTask;
+
+      // Upload image file
+      final imageUrl = await uploadSnapshot.ref.getDownloadURL();
+
+      // Save data to Firebase database
+      final data = {
+        'imageUrl': imageUrl,
+        'predictionText': selectedPredictionText,
+        'recommendationText': selectedRecommendationText,
+      };
+      await collectionRef.add(data);
+
+      // Delete the local copy
+      await selectedImageFile.delete();
+
+      setState(() {
+        // Remove the deleted data from the lists
+        _imageFiles.removeAt(_selectedRowIndex);
+        _predictionTexts.removeAt(_selectedRowIndex);
+        _timestamps.removeAt(_selectedRowIndex);
+        _recommendationTexts.removeAt(_selectedRowIndex);
+        _selectedRowIndex = -1; // Reset the selected row index
+      });
+
+      // Show a snackbar to indicate successful upload and deletion
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Data uploaded and local copy deleted.'),
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final columns = [
+      DataColumn(
+        label: Text('Image'),
+      ),
+      DataColumn(
+        label: Text('Prediction'),
+      ),
+      DataColumn(
+        label: Text('Timestamp'),
+      ),
+      DataColumn(
+        label: Text('Recommendation'),
+      ),
+    ];
     return Scaffold(
       key: _scaffoldKey,
       body: Column(children: [
@@ -139,8 +206,9 @@ class DataTableHistoryState extends State<DataTableHistory> {
                       _imageFiles.isNotEmpty
                           ? SingleChildScrollView(
                               child: PaginatedDataTable(
+                                showCheckboxColumn: true,
                                 rowsPerPage: _rowsPerPage,
-                                columnSpacing: 35,
+                                columnSpacing: 10,
                                 availableRowsPerPage: [10, 25, 50],
                                 onPageChanged: (pageIndex) {
                                   setState(() {
@@ -153,34 +221,24 @@ class DataTableHistoryState extends State<DataTableHistory> {
                                   recommendationTexts: _recommendationTexts,
                                   pageIndex: _pageIndex,
                                   rowsPerPage: _rowsPerPage,
+                                  selectedRowIndex: _selectedRowIndex,
+                                  onSelectRow: (index) {
+                                    setState(() {
+                                      _selectedRowIndex = index!;
+                                    });
+                                  },
                                 ),
-                                columns: [
-                                  DataColumn(
-                                      label: Text(
-                                    'Date and Time',
-                                    textAlign: TextAlign.center,
-                                  )),
-                                  DataColumn(
-                                      label: Text(
-                                    'Image',
-                                    textAlign: TextAlign.center,
-                                  )),
-                                  DataColumn(
-                                      label: Text(
-                                    'Prediction',
-                                    textAlign: TextAlign.center,
-                                  )),
-                                  DataColumn(
-                                      label: Text(
-                                    'Recommendation',
-                                    textAlign: TextAlign.center,
-                                  )),
-                                ],
+                                columns: columns,
                               ),
                             )
                           : Center(
                               child: CircularProgressIndicator(),
                             ),
+                      FloatingActionButton(
+                        onPressed:
+                            _uploadDataAndDeleteLocalCopy, // Trigger the upload and deletion process
+                        child: Icon(Icons.upload),
+                      ),
                     ],
                   ),
                 ),
@@ -217,6 +275,8 @@ class ImageDataTableSource extends DataTableSource {
   final List<String> recommendationTexts;
   final int pageIndex;
   final int rowsPerPage;
+  final int? selectedRowIndex;
+  final Function(int?) onSelectRow;
 
   ImageDataTableSource({
     required this.imageFiles,
@@ -224,6 +284,8 @@ class ImageDataTableSource extends DataTableSource {
     required this.pageIndex,
     required this.rowsPerPage,
     required this.recommendationTexts,
+    required this.selectedRowIndex,
+    required this.onSelectRow,
   });
 
   @override
@@ -241,26 +303,30 @@ class ImageDataTableSource extends DataTableSource {
     return DataRow.byIndex(
       index: index,
       cells: [
-        DataCell(Text(dateTime)),
-        DataCell(Image.file(
-          imageFile,
+        DataCell(Container(
           width: 50,
           height: 50,
+          child: Image.file(imageFile),
         )),
         DataCell(Text(predictionText)),
+        DataCell(Text(dateTime)),
         DataCell(Text(recommendationText)),
       ],
+      selected: selectedRowIndex == index,
+      onSelectChanged: (isSelected) {
+        onSelectRow(isSelected! ? index : null);
+      },
     );
   }
-
-  @override
-  int get rowCount => imageFiles.length;
 
   @override
   bool get isRowCountApproximate => false;
 
   @override
-  int get selectedRowCount => 0;
+  int get rowCount => imageFiles.length;
+
+  @override
+  int get selectedRowCount => 1;
 }
 
 /*

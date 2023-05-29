@@ -1,5 +1,6 @@
 import 'package:deficam/camscreen.dart';
 import 'package:deficam/dashboardScreen.dart';
+import 'package:deficam/historyScreen.dart';
 import 'package:deficam/reportsScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:deficam/splashScreen.dart';
@@ -25,7 +26,7 @@ class deficamApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: splashScreen(),
+      home: DataTableHistory(),
       debugShowCheckedModeBanner: false,
     );
   }

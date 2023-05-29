@@ -56,7 +56,7 @@ class _HomeState extends State<Home> {
       item['recommendation'] = recommendation;
     }
     setState(() {
-      _output = output!;
+      _output = output;
       _loading = false;
     });
   }
