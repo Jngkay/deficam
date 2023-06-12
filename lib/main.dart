@@ -26,7 +26,7 @@ class deficamApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: Home(),
+      home: DataTableHistory(),
       debugShowCheckedModeBanner: false,
     );
   }

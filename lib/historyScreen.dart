@@ -119,7 +119,7 @@ class DataTableHistoryState extends State<DataTableHistory> {
       // Show a snackbar to indicate successful upload and deletion
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Data uploaded and local copy deleted.'),
+          content: Text('Successfully uploaded'),
         ),
       );
     }
@@ -129,16 +129,36 @@ class DataTableHistoryState extends State<DataTableHistory> {
   Widget build(BuildContext context) {
     final columns = [
       DataColumn(
-        label: Text('Image'),
+        label: Text('Image',
+            textAlign: TextAlign.center,
+            style: GoogleFonts.roboto(
+              fontSize: 15,
+              fontWeight: FontWeight.w800,
+            )),
       ),
       DataColumn(
-        label: Text('Prediction'),
+        label: Text('Prediction',
+            textAlign: TextAlign.center,
+            style: GoogleFonts.roboto(
+              fontSize: 15,
+              fontWeight: FontWeight.w800,
+            )),
       ),
       DataColumn(
-        label: Text('Timestamp'),
+        label: Text('Timestamp',
+            textAlign: TextAlign.center,
+            style: GoogleFonts.roboto(
+              fontSize: 16,
+              fontWeight: FontWeight.w800,
+            )),
       ),
       DataColumn(
-        label: Text('Recommendation'),
+        label: Text('Recommendation',
+            textAlign: TextAlign.center,
+            style: GoogleFonts.roboto(
+              fontSize: 15,
+              fontWeight: FontWeight.w800,
+            )),
       ),
     ];
     return Scaffold(
@@ -234,20 +254,6 @@ class DataTableHistoryState extends State<DataTableHistory> {
                           : Center(
                               child: CircularProgressIndicator(),
                             ),
-                      ElevatedButton.icon(
-                        style: ElevatedButton.styleFrom(primary: Colors.white),
-                        onPressed:
-                            _uploadDataAndDeleteLocalCopy, // Trigger the upload and deletion process
-                        icon: Icon(
-                          Icons.upload,
-                          color: Colors.black,
-                          size: 40,
-                        ),
-                        label: Text(
-                          'Upload',
-                          style: TextStyle(color: Colors.black, fontSize: 20),
-                        ),
-                      ),
                     ],
                   ),
                 ),
@@ -270,6 +276,26 @@ class DataTableHistoryState extends State<DataTableHistory> {
                   ),
                 ),
               ),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 30, right: 20),
+                child: Align(
+                  alignment: Alignment.bottomRight,
+                  child: ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(primary: Colors.white),
+                    onPressed:
+                        _uploadDataAndDeleteLocalCopy, // Trigger the upload and deletion process
+                    icon: Icon(
+                      Icons.upload,
+                      color: Colors.black,
+                      size: 40,
+                    ),
+                    label: Text(
+                      'Upload',
+                      style: TextStyle(color: Colors.black, fontSize: 20),
+                    ),
+                  ),
+                ),
+              )
             ],
           ),
         ),
@@ -302,12 +328,12 @@ class ImageDataTableSource extends DataTableSource {
     if (index >= imageFiles.length) {
       return null;
     }
-
-    final imageFile = imageFiles[index];
-    final predictionText = predictionTexts[index];
-    final recommendationText = recommendationTexts[index];
+    final reversedIndex = imageFiles.length - 1 - index;
+    final imageFile = imageFiles[reversedIndex];
+    final predictionText = predictionTexts[reversedIndex];
+    final recommendationText = recommendationTexts[reversedIndex];
     final dateTime =
-        DateFormat('yyyy-MM-dd HH:mm:ss').format(imageFile.lastModifiedSync());
+        DateFormat('hh:mm M-dd-yy ').format(imageFile.lastModifiedSync());
 
     return DataRow.byIndex(
       index: index,
@@ -317,9 +343,13 @@ class ImageDataTableSource extends DataTableSource {
           height: 50,
           child: Image.file(imageFile),
         )),
-        DataCell(Text(predictionText)),
-        DataCell(Text(dateTime)),
-        DataCell(Text(recommendationText)),
+        DataCell(Text(
+          predictionText,
+          style: GoogleFonts.roboto(fontSize: 15),
+        )),
+        DataCell(Text(dateTime, style: GoogleFonts.roboto(fontSize: 15))),
+        DataCell(
+            Text(recommendationText, style: GoogleFonts.roboto(fontSize: 15))),
       ],
       selected: selectedRowIndex == index,
       onSelectChanged: (isSelected) {
