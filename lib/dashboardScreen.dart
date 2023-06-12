@@ -185,7 +185,7 @@ class _dashboardScreenState extends State<dashboardScreen> {
                                     Navigator.pushReplacement(
                                         context,
                                         MaterialPageRoute(
-                                            builder: (_) => reportsScreen()));
+                                            builder: (_) => ReportScreen()));
                                   },
                                   child: Container(
                                     decoration: BoxDecoration(

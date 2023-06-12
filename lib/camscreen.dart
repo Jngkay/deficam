@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:ui';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:deficam/dashboardScreen.dart';
 import 'package:flutter/foundation.dart';
@@ -23,10 +24,13 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   bool _loading = true;
+  bool _saving = false;
   late File _image;
   late List _output;
   final picker = ImagePicker();
   String _predictedClass = '';
+
+  GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
 
   @override
   void initState() {
@@ -107,6 +111,9 @@ class _HomeState extends State<Home> {
   }
 
   void _saveImageAndPrediction() async {
+    setState(() {
+      _saving = true;
+    });
     final directory = await getApplicationDocumentsDirectory();
     final timestamp = DateTime.now().millisecondsSinceEpoch;
     final fileName = 'image_$timestamp.jpg';
@@ -132,12 +139,27 @@ class _HomeState extends State<Home> {
     await recomendationFile.writeAsString(
       _output[0]['recommendation'],
     );
+    await Future.delayed(Duration(seconds: 2));
 
     if (await compressedImage.exists() && await predictionFile.exists()) {
       print('Files saved successfully');
     } else {
       print('File save failed');
     }
+    setState(() {
+      _saving = false; // Set saving state to false
+      _loading = true; // Reset the loading state
+      _output = []; // Clear the output list
+      _predictedClass = ''; // Reset the predicted class variable
+    });
+  }
+
+  void cancelButton() {
+    setState(() {
+      _loading = true; // Reset the loading state
+      _output = []; // Clear the output list
+      _predictedClass = ''; // Reset the predicted class variable
+    });
   }
 
   Future<File> compressImage(File image, String targetPath) async {
@@ -180,8 +202,6 @@ class _HomeState extends State<Home> {
     // Print a message to indicate that the image and prediction were saved
     print('Image and prediction saved to Firebase');
   }
-
-  GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
 
   @override
   Widget build(BuildContext context) {
@@ -250,60 +270,11 @@ class _HomeState extends State<Home> {
                           ],
                         ),
                         SizedBox(
-                          height: 60,
+                          height: 10,
                         ),
                         Container(
                           child: Column(
                             children: [
-                              GestureDetector(
-                                onTap: pickImage,
-                                child: Container(
-                                    width:
-                                        MediaQuery.of(context).size.width - 200,
-                                    alignment: Alignment.center,
-                                    padding: EdgeInsets.symmetric(
-                                        horizontal: 24, vertical: 17),
-                                    decoration: BoxDecoration(
-                                      color: Colors.lightBlueAccent,
-                                      borderRadius: BorderRadius.circular(15),
-                                    ),
-                                    child: Text(
-                                      'Capture using camera',
-                                      style: TextStyle(
-                                          color: Colors.white, fontSize: 16),
-                                    )),
-                              ),
-                              SizedBox(
-                                height: 30,
-                              ),
-                              GestureDetector(
-                                onTap: pickGalleryImage,
-                                child: Container(
-                                    width:
-                                        MediaQuery.of(context).size.width - 200,
-                                    alignment: Alignment.center,
-                                    padding: EdgeInsets.symmetric(
-                                        horizontal: 24, vertical: 17),
-                                    decoration: BoxDecoration(
-                                      color: Colors.lightBlueAccent,
-                                      borderRadius: BorderRadius.circular(15),
-                                    ),
-                                    child: Text(
-                                      'Capture using gallery picker',
-                                      style: TextStyle(
-                                          color: Colors.white, fontSize: 16),
-                                    )),
-                              ),
-                              SizedBox(
-                                height: 50,
-                              ),
-                              ElevatedButton(
-                                onPressed: _saveImageAndPrediction,
-                                child: Text('Save image and prediction'),
-                              ),
-                              SizedBox(
-                                height: 20,
-                              ),
                               Center(
                                 child: _loading == true
                                     ? null
@@ -314,11 +285,11 @@ class _HomeState extends State<Home> {
                                               height: MediaQuery.of(context)
                                                       .size
                                                       .width *
-                                                  0.5,
+                                                  0.95,
                                               width: MediaQuery.of(context)
                                                       .size
                                                       .width *
-                                                  0.5,
+                                                  0.75,
                                               child: ClipRRect(
                                                 borderRadius:
                                                     BorderRadius.circular(30),
@@ -329,9 +300,93 @@ class _HomeState extends State<Home> {
                                               ),
                                             ),
                                             _output.isNotEmpty
-                                                ? Text(
-                                                    'Plant Status :  ${_output[0]['label']} \nRecommendation: ${_output[0]['recommendation']}',
-                                                  )
+                                                ? _saving
+                                                    ? CircularProgressIndicator() // Show circular loading indicator while saving
+                                                    : Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .only(top: 10),
+                                                        child: Column(
+                                                          children: [
+                                                            Text(
+                                                              'Plant Status :  ${_output[0]['label']} \nRecommendation: ${_output[0]['recommendation']}',
+                                                              style: TextStyle(
+                                                                fontSize: 30,
+                                                              ),
+                                                            ),
+                                                            SizedBox(
+                                                              height: 20,
+                                                            ),
+                                                            Row(
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .center,
+                                                              children: [
+                                                                ElevatedButton
+                                                                    .icon(
+                                                                  icon: Icon(
+                                                                    Icons.save,
+                                                                    size: 25,
+                                                                    color: Colors
+                                                                        .blue,
+                                                                  ),
+                                                                  onPressed:
+                                                                      _saveImageAndPrediction,
+                                                                  label: Text(
+                                                                    'Save result',
+                                                                    style: TextStyle(
+                                                                        color: Colors
+                                                                            .black,
+                                                                        fontSize:
+                                                                            15),
+                                                                  ),
+                                                                  style: ElevatedButton.styleFrom(
+                                                                      shape: RoundedRectangleBorder(
+                                                                          borderRadius: BorderRadius.circular(
+                                                                              40)),
+                                                                      backgroundColor: Color.fromARGB(
+                                                                          255,
+                                                                          255,
+                                                                          255,
+                                                                          255)),
+                                                                ),
+                                                                SizedBox(
+                                                                  width: 20,
+                                                                ),
+                                                                ElevatedButton
+                                                                    .icon(
+                                                                  icon: Icon(
+                                                                    Icons
+                                                                        .cancel,
+                                                                    size: 25,
+                                                                    color: Colors
+                                                                        .blue,
+                                                                  ),
+                                                                  onPressed:
+                                                                      cancelButton,
+                                                                  label: Text(
+                                                                    'Cancel',
+                                                                    style: TextStyle(
+                                                                        color: Colors
+                                                                            .black,
+                                                                        fontSize:
+                                                                            15),
+                                                                  ),
+                                                                  style: ElevatedButton.styleFrom(
+                                                                      shape: RoundedRectangleBorder(
+                                                                          borderRadius: BorderRadius.circular(
+                                                                              40)),
+                                                                      backgroundColor: Color.fromARGB(
+                                                                          255,
+                                                                          255,
+                                                                          255,
+                                                                          255)),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      )
                                                 : Container(),
                                             Divider(
                                               height: 25,
@@ -343,7 +398,7 @@ class _HomeState extends State<Home> {
                               ),
                             ],
                           ),
-                        )
+                        ),
                       ],
                     ),
                   ),
@@ -366,6 +421,63 @@ class _HomeState extends State<Home> {
                     ),
                   ),
                 ),
+                Align(
+                  alignment: Alignment.bottomCenter,
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: 60),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        SizedBox(
+                          width: 150,
+                          height: 70,
+                          child: ElevatedButton.icon(
+                            onPressed: pickImage,
+                            icon: Icon(
+                              // <-- Icon
+                              Icons.camera,
+                              size: 26.0,
+                            ),
+                            style: ElevatedButton.styleFrom(
+                              primary: Colors.blue[600],
+                            ),
+                            label: Text(
+                              'Capture using Camera',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(fontSize: 20),
+                            ), // <-- Text
+                          ),
+                        ),
+                        SizedBox(
+                          width: 50,
+                        ),
+                        SizedBox(
+                          width: 150,
+                          height: 70,
+                          child: ElevatedButton.icon(
+                            onPressed: pickGalleryImage,
+                            icon: Icon(
+                              // <-- Icon
+                              Icons.image,
+                              size: 26.0,
+                            ),
+                            style: ElevatedButton.styleFrom(
+                              primary: Colors.blue[700],
+                            ),
+                            label: Text(
+                              'Capture using Gallery Picker',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 20,
+                              ),
+                            ), // <-- Text
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
@@ -374,8 +486,6 @@ class _HomeState extends State<Home> {
     );
   }
 }
-
-
 
 /* 
 
