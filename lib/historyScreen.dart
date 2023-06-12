@@ -244,7 +244,13 @@ class DataTableHistoryState extends State<DataTableHistory> {
                                   selectedRowIndex: _selectedRowIndex,
                                   onSelectRow: (index) {
                                     setState(() {
-                                      _selectedRowIndex = index!;
+                                      if (_selectedRowIndex == index) {
+                                        // Unselect the row if it was already selected
+                                        _selectedRowIndex = -1;
+                                      } else {
+                                        // Select the new row
+                                        _selectedRowIndex = index;
+                                      }
                                     });
                                   },
                                 ),
@@ -310,15 +316,15 @@ class ImageDataTableSource extends DataTableSource {
   final List<String> recommendationTexts;
   final int pageIndex;
   final int rowsPerPage;
-  final int? selectedRowIndex;
-  final Function(int?) onSelectRow;
+  final int selectedRowIndex;
+  final Function(int) onSelectRow;
 
   ImageDataTableSource({
     required this.imageFiles,
     required this.predictionTexts,
+    required this.recommendationTexts,
     required this.pageIndex,
     required this.rowsPerPage,
-    required this.recommendationTexts,
     required this.selectedRowIndex,
     required this.onSelectRow,
   });
@@ -326,7 +332,7 @@ class ImageDataTableSource extends DataTableSource {
   @override
   DataRow? getRow(int index) {
     if (index >= imageFiles.length) {
-      return null;
+      throw RangeError('Invalid index');
     }
     final reversedIndex = imageFiles.length - 1 - index;
     final imageFile = imageFiles[reversedIndex];
@@ -353,7 +359,9 @@ class ImageDataTableSource extends DataTableSource {
       ],
       selected: selectedRowIndex == index,
       onSelectChanged: (isSelected) {
-        onSelectRow(isSelected! ? index : null);
+        if (isSelected != null) {
+          onSelectRow(isSelected ? index : -1);
+        }
       },
     );
   }
@@ -365,5 +373,5 @@ class ImageDataTableSource extends DataTableSource {
   int get rowCount => imageFiles.length;
 
   @override
-  int get selectedRowCount => 1;
+  int get selectedRowCount => selectedRowIndex >= 0 ? 1 : 0;
 }
