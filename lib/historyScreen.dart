@@ -29,6 +29,7 @@ class DataTableHistoryState extends State<DataTableHistory> {
   int _rowsPerPage = PaginatedDataTable.defaultRowsPerPage;
   int _pageIndex = 0;
   int _selectedRowIndex = -1;
+  bool _uploading = false;
 
   @override
   void initState() {
@@ -80,6 +81,9 @@ class DataTableHistoryState extends State<DataTableHistory> {
     final collectionRef = firestore.collection('DeficamClassification');
 
     if (_selectedRowIndex >= 0 && _selectedRowIndex < _imageFiles.length) {
+      setState(() {
+        _uploading = true; // Set the flag to true while uploading
+      });
       // Get the selected row data
       final selectedImageFile = _imageFiles[_selectedRowIndex];
       final selectedPredictionText = _predictionTexts[_selectedRowIndex];
@@ -114,6 +118,7 @@ class DataTableHistoryState extends State<DataTableHistory> {
         _timestamps.removeAt(_selectedRowIndex);
         _recommendationTexts.removeAt(_selectedRowIndex);
         _selectedRowIndex = -1; // Reset the selected row index
+        _uploading = false;
       });
 
       // Show a snackbar to indicate successful upload and deletion
@@ -258,7 +263,10 @@ class DataTableHistoryState extends State<DataTableHistory> {
                               ),
                             )
                           : Center(
-                              child: CircularProgressIndicator(),
+                              child:
+                                  _uploading // Display the loading indicator if uploading
+                                      ? CircularProgressIndicator()
+                                      : CircularProgressIndicator(),
                             ),
                     ],
                   ),
@@ -288,8 +296,9 @@ class DataTableHistoryState extends State<DataTableHistory> {
                   alignment: Alignment.bottomRight,
                   child: ElevatedButton.icon(
                     style: ElevatedButton.styleFrom(primary: Colors.white),
-                    onPressed:
-                        _uploadDataAndDeleteLocalCopy, // Trigger the upload and deletion process
+                    onPressed: _uploading // Disable the button if already uploading
+                        ? null
+                        : _uploadDataAndDeleteLocalCopy, // Trigger the upload and deletion process
                     icon: Icon(
                       Icons.upload,
                       color: Colors.black,
