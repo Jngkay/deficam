@@ -301,7 +301,23 @@ class _HomeState extends State<Home> {
                                             ),
                                             _output.isNotEmpty
                                                 ? _saving
-                                                    ? CircularProgressIndicator() // Show circular loading indicator while saving
+                                                    ? Column(
+                                                        children: [
+                                                          SizedBox(height: 20),
+                                                          CircularProgressIndicator(),
+                                                          SizedBox(height: 20),
+                                                          Text(
+                                                            'Saving...',
+                                                            style: TextStyle(
+                                                                color: Colors
+                                                                    .white,
+                                                                fontSize: 30,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold),
+                                                          ),
+                                                        ],
+                                                      )
                                                     : Padding(
                                                         padding:
                                                             const EdgeInsets
@@ -365,7 +381,7 @@ class _HomeState extends State<Home> {
                                                                   onPressed:
                                                                       cancelButton,
                                                                   label: Text(
-                                                                    'Cancel',
+                                                                    'Retake',
                                                                     style: TextStyle(
                                                                         color: Colors
                                                                             .black,
