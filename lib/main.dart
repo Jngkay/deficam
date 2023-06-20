@@ -8,6 +8,8 @@ import 'package:camera/camera.dart';
 import 'package:deficam/classifyScreen.dart';
 import 'package:firebase_core/firebase_core.dart';
 
+import 'cameraclassify.dart';
+
 //List<CameraDescription> cameras = List.empty(growable: true);
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -26,7 +28,7 @@ class deficamApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: splashScreen(),
+      home: CameraScreen(),
       debugShowCheckedModeBanner: false,
     );
   }

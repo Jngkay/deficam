@@ -60,7 +60,7 @@ dependencies:
   firebase_storage: ^10.0.4
   flutter_image_compress: ^1.0.0
   syncfusion_flutter_charts: ^21.1.37
-  
+  permission_handler: ^10.3.0
 
 
 dev_dependencies:
