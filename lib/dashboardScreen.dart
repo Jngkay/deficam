@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:camera/camera.dart';
+import 'package:deficam/cameraclassify.dart';
 import 'package:deficam/camscreen.dart';
 import 'package:deficam/classifyScreen.dart';
 import 'package:deficam/didyouknowScreen.dart';
@@ -97,7 +98,7 @@ class _dashboardScreenState extends State<dashboardScreen> {
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (context) => Home(),
+                                        builder: (context) => CameraScreen(),
                                       ),
                                     );
                                     /*

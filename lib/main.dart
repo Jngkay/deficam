@@ -28,7 +28,7 @@ class deficamApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: CameraScreen(),
+      home: dashboardScreen(),
       debugShowCheckedModeBanner: false,
     );
   }
