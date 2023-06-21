@@ -11,6 +11,7 @@ import 'package:tflite/tflite.dart';
 import 'package:flutter/services.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:intl/intl.dart';
+import 'package:deficam/dbHelper.dart';
 
 class CameraScreen extends StatefulWidget {
   @override
@@ -227,7 +228,17 @@ class _CameraScreenState extends State<CameraScreen> {
                 height: 20,
               ),
               ElevatedButton(
-                onPressed: () {},
+                onPressed: () async {
+                  await DBHelper.saveResult(
+                    prediction: prediction!,
+                    confidence: confidence!,
+                    imagePath: capturedImage!.path,
+                    captureTime: captureTime!,
+                  );
+                  Navigator.pop(context); // Close the dialog
+                  timer?.cancel();
+                  classifyStillImage();
+                },
                 child: Text('Save result'),
               ),
               ElevatedButton(
