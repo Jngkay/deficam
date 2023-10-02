@@ -1,3 +1,6 @@
+//This screen is not the updated classify screen
+//Do not make changes here
+
 import 'dart:io';
 import 'dart:ui';
 import 'package:cloud_firestore/cloud_firestore.dart';

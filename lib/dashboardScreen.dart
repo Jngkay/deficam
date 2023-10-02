@@ -24,10 +24,13 @@ class _dashboardScreenState extends State<dashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
+    //On will pop for confirmation if the user want to close the application
     return WillPopScope(
       onWillPop: _onWillPop,
       child: Scaffold(
         key: _scaffoldKey,
+       
+        //Builds the dashboard board front end design
         body: Column(
           children: [
             Container(

@@ -2,7 +2,7 @@ import 'dart:io';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:connectivity_plus/connectivity_plus.dart'; // Import the connectivity_plus package
+import 'package:connectivity_plus/connectivity_plus.dart';
 
 class DBHelper {
   static Database? _database;

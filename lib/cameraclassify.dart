@@ -1,3 +1,6 @@
+//This is the current and working camera clasify screen
+//Continue to update this code
+
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
@@ -36,6 +39,7 @@ class _CameraScreenState extends State<CameraScreen> {
     loadModel();
   }
 
+  //This code will initiliaze the camera and in every 3 seconds it will classify the leaf image
   Future<void> initializeCamera() async {
     await Permission.camera.request();
     cameras = await availableCameras();
@@ -51,6 +55,7 @@ class _CameraScreenState extends State<CameraScreen> {
     timer = Timer(Duration(seconds: 3), classifyStillImage);
   }
 
+  //This code will load the tflite model as well as the class labels
   Future<void> loadModel() async {
     await Tflite.loadModel(
       model: 'assets/model.tflite',
@@ -58,6 +63,7 @@ class _CameraScreenState extends State<CameraScreen> {
     );
   }
 
+  //This code will capture still image in front of the camera. 
   void classifyStillImage() async {
     if (cameraController!.value.isTakingPicture) return;
     if (timer?.isActive == false)
@@ -79,6 +85,7 @@ class _CameraScreenState extends State<CameraScreen> {
     }
   }
 
+  //Based on the captured still image. This code will run through the image to the tflite model
   void classifyImage(File imageFile) async {
     var recognitions = await Tflite.runModelOnImage(
       path: imageFile.path,
@@ -109,6 +116,7 @@ class _CameraScreenState extends State<CameraScreen> {
     });
   }
 
+  //Based on the classifed image and prediction. Recommendation of foliar fertilizer will be retrieve(recommendations.json) and displayed
   Future<String> getRecommendationForClass(String className) async {
     final jsonContent =
         await rootBundle.loadString('assets/recommendations.json');
@@ -121,7 +129,9 @@ class _CameraScreenState extends State<CameraScreen> {
       throw Exception('Recommendation not found for class: $className');
     }
   }
-
+  
+  //This dialog will show once the user clicks view result. 
+  //The result includes the captured image, prediction class, foliar fertilizer recommendation and confidence level
   void _showDialog() {
     showDialog(
       context: context,
@@ -414,7 +424,10 @@ class _CameraScreenState extends State<CameraScreen> {
     if (!isCameraReady) {
       return Container(); // Return an empty container while camera is initializing
     }
-
+    
+    //This code builds the front end of the camera classify screen
+    //It will show the camera preview
+    //Automatically captures the image and classify it
     return Scaffold(
       body: Column(
         children: [

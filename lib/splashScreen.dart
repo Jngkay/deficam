@@ -15,12 +15,13 @@ class _splashScreenState extends State<splashScreen> {
   @override
   void initState() {
     super.initState();
+    //After 5 seconds the screen will redirect to the Dashboard
     Timer(
         Duration(seconds: 5),
         () => Navigator.pushReplacement(context,
             MaterialPageRoute(builder: (context) => dashboardScreen())));
   }
-
+  // This builds the front end design of the Splashscreen
   @override
   Widget build(BuildContext context) {
     return Container(
