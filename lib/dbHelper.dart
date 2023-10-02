@@ -1,10 +1,8 @@
-// db_helper.dart
-
 import 'dart:io';
-
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:connectivity_plus/connectivity_plus.dart'; // Import the connectivity_plus package
 
 class DBHelper {
   static Database? _database;
@@ -21,7 +19,7 @@ class DBHelper {
   static Future<Database> initDatabase() async {
     // Get the directory for storing the database
     Directory documentsDirectory = await getApplicationDocumentsDirectory();
-    String path = join(documentsDirectory.path, 'your_database.db');
+    String path = join(documentsDirectory.path, 'classification_database.db');
 
     // Open the database
     return openDatabase(path, version: 1, onCreate: _createTable);
@@ -34,24 +32,34 @@ class DBHelper {
         prediction TEXT,
         confidence REAL,
         imagePath TEXT,
-        captureTime TEXT
+        captureTime TEXT,
+        synced BOOLEAN DEFAULT 0
       )
     ''');
   }
 
-  static Future<void> saveResult({
+  static Future<int> saveResult({
     required String prediction,
     required double confidence,
     required String imagePath,
     required DateTime captureTime,
+    bool synced = false,
   }) async {
     final db = await database;
 
-    await db!.insert('classification_result', {
+    final result = await db!.insert('classification_result', {
       'prediction': prediction,
       'confidence': confidence,
       'imagePath': imagePath,
       'captureTime': captureTime.toIso8601String(),
+      'synced': synced ? 1 : 0,
     });
+    return result;
+  }
+
+  // Function to check internet connection
+  static Future<bool> isInternetConnected() async {
+    var connectivityResult = await Connectivity().checkConnectivity();
+    return connectivityResult != ConnectivityResult.none;
   }
 }

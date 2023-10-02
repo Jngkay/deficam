@@ -125,18 +125,61 @@ class _CameraScreenState extends State<CameraScreen> {
   void _showDialog() {
     showDialog(
       context: context,
+      barrierDismissible: false,
       builder: (BuildContext context) {
+        bool isSaving = false;
+        bool isSaved = false;
+
+        Future<void> saveResult() async {
+          setState(() {
+            isSaving = true; // Set the saving flag to true
+          });
+          await Future.delayed(Duration(seconds: 2));
+
+          setState(() {
+            isSaving = false; // Set the saving flag to false
+            isSaved = true; // Set the saved flag to true
+          });
+
+          // Close the dialog after 1 second
+          Timer(Duration(seconds: 5), () {
+            Navigator.pop(context); // Close the dialog
+          });
+        }
+
         return Dialog(
           child: Container(
             padding: EdgeInsets.all(16),
             child: Column(mainAxisSize: MainAxisSize.min, children: [
+              if (isSaving)
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SizedBox(
+                      width: 24,
+                      height: 24,
+                      child: CircularProgressIndicator(
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.black),
+                        strokeWidth: 2.0,
+                      ),
+                    ),
+                    SizedBox(width: 10),
+                    Text('Saving...'),
+                  ],
+                ),
+              if (isSaved)
+                Text(
+                  'Saved',
+                  style: TextStyle(color: Colors.green),
+                ),
               Text(
                 'Classification Result',
                 textAlign: TextAlign.left,
                 style: GoogleFonts.roboto(
-                    color: Colors.black,
-                    fontSize: 25.0,
-                    fontWeight: FontWeight.bold),
+                  color: Colors.black,
+                  fontSize: 25.0,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               SizedBox(
                 height: 20,
@@ -159,95 +202,197 @@ class _CameraScreenState extends State<CameraScreen> {
                 height: 15,
               ),
               if (prediction != null)
-                Text(
-                  'Deficiency Classification: ',
-                  style: GoogleFonts.roboto(
-                      color: Colors.black,
-                      fontSize: 18.0,
-                      fontWeight: FontWeight.normal),
+                Row(
+                  children: [
+                    Expanded(
+                      flex: 55,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Deficiency Classification: ',
+                            style: GoogleFonts.roboto(
+                              color: Colors.black,
+                              fontSize: 17.0,
+                              fontWeight: FontWeight.normal,
+                            ),
+                          ),
+                          SizedBox(
+                            height: 8,
+                          ),
+                          if (confidence != null)
+                            Text(
+                              'Confidence:',
+                              style: GoogleFonts.roboto(
+                                color: Colors.black,
+                                fontSize: 17.0,
+                                fontWeight: FontWeight.normal,
+                              ),
+                            ),
+                          SizedBox(
+                            height: 8,
+                          ),
+                          Text(
+                            'Foliar Fertilizer',
+                            style: GoogleFonts.roboto(
+                              color: Colors.black,
+                              fontSize: 17.0,
+                              fontWeight: FontWeight.normal,
+                            ),
+                          ),
+                          Text(
+                            'Recommendation: ',
+                            style: GoogleFonts.roboto(
+                              color: Colors.black,
+                              fontSize: 17.0,
+                              fontWeight: FontWeight.normal,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Expanded(
+                      flex: 45,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Text(
+                            '$prediction',
+                            style: GoogleFonts.roboto(
+                              color: Colors.black,
+                              fontSize: 17.0,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          SizedBox(
+                            height: 8,
+                          ),
+                          Text(
+                            '${confidence!.toStringAsFixed(2)}',
+                            style: GoogleFonts.roboto(
+                              color: Colors.black,
+                              fontSize: 17.0,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          SizedBox(
+                            height: 8,
+                          ),
+                          if (prediction != null)
+                            FutureBuilder<String>(
+                              future: getRecommendationForClass(prediction!),
+                              builder: (context, snapshot) {
+                                if (snapshot.hasData) {
+                                  return Text(
+                                    snapshot.data!,
+                                    style: GoogleFonts.roboto(
+                                      color: Colors.black,
+                                      fontSize: 17.0,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  );
+                                } else if (snapshot.hasError) {
+                                  return Text(
+                                    'Error: ${snapshot.error}',
+                                    style: TextStyle(color: Colors.red),
+                                  );
+                                }
+                                return CircularProgressIndicator();
+                              },
+                            ),
+                          SizedBox(
+                            height: 8,
+                          ),
+                          Text(''),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
-              Text(
-                '$prediction',
-                style: GoogleFonts.roboto(
-                    color: Colors.black,
-                    fontSize: 18.0,
-                    fontWeight: FontWeight.bold),
-              ),
               SizedBox(
-                height: 15,
+                height: 30,
               ),
-              if (confidence != null)
-                Text(
-                  'Confidence:',
-                  style: GoogleFonts.roboto(
-                      color: Colors.black,
-                      fontSize: 18.0,
-                      fontWeight: FontWeight.normal),
-                ),
-              Text(
-                '${confidence!.toStringAsFixed(2)}',
-                style: GoogleFonts.roboto(
-                    color: Colors.black,
-                    fontSize: 18.0,
-                    fontWeight: FontWeight.bold),
-              ),
-              SizedBox(
-                height: 15,
-              ),
-              Text(
-                'Foliar Fertilizer Recommendation: ',
-                style: GoogleFonts.roboto(
-                  color: Colors.black,
-                  fontSize: 18.0,
-                  fontWeight: FontWeight.normal,
-                ),
-              ),
-              if (prediction != null)
-                FutureBuilder<String>(
-                  future: getRecommendationForClass(prediction!),
-                  builder: (context, snapshot) {
-                    if (snapshot.hasData) {
-                      return Text(
-                        snapshot.data!,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SizedBox(
+                    width: 120,
+                    height: 50,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green,
+                      ),
+                      onPressed: isSaving
+                          ? null
+                          : () async {
+                              setState(() {
+                                isSaving = true;
+                              });
+                              final classificationData = {
+                                'prediction': prediction,
+                                'confidence': confidence,
+                                'imagePath': capturedImage!.path,
+                                'captureTime': captureTime!,
+                              };
+
+                              final primaryKey = await DBHelper.saveResult(
+                                prediction:
+                                    classificationData['prediction'] as String,
+                                confidence:
+                                    classificationData['confidence'] as double,
+                                imagePath:
+                                    classificationData['imagePath'] as String,
+                                captureTime: classificationData['captureTime']
+                                    as DateTime,
+                              );
+                              if (primaryKey != -1) {
+                                setState(() {
+                                  isSaving = false;
+                                  isSaved = true;
+                                });
+                                Timer(Duration(seconds: 2), () {
+                                  Navigator.pop(context);
+                                });
+                              } else {
+                                print('Error saving result');
+                              }
+                            },
+                      child: Text(
+                        'Save',
                         style: GoogleFonts.roboto(
-                          color: Colors.black,
-                          fontSize: 18.0,
+                          color: Colors.white,
+                          fontSize: 20.0,
                           fontWeight: FontWeight.bold,
                         ),
-                      );
-                    } else if (snapshot.hasError) {
-                      return Text(
-                        'Error: ${snapshot.error}',
-                        style: TextStyle(color: Colors.red),
-                      );
-                    }
-                    return CircularProgressIndicator();
-                  },
-                ),
-              SizedBox(
-                height: 20,
-              ),
-              ElevatedButton(
-                onPressed: () async {
-                  await DBHelper.saveResult(
-                    prediction: prediction!,
-                    confidence: confidence!,
-                    imagePath: capturedImage!.path,
-                    captureTime: captureTime!,
-                  );
-                  Navigator.pop(context); // Close the dialog
-                  timer?.cancel();
-                  classifyStillImage();
-                },
-                child: Text('Save result'),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.pop(context); // Close the dialog
-                  timer?.cancel();
-                  classifyStillImage();
-                },
-                child: Text('Retake'),
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    width: 20,
+                  ),
+                  SizedBox(
+                    width: 100,
+                    height: 50,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blue,
+                      ),
+                      onPressed: () {
+                        Navigator.pop(context);
+                        timer?.cancel();
+                        classifyStillImage();
+                      },
+                      child: Text(
+                        'Retake',
+                        style: GoogleFonts.roboto(
+                          color: Colors.white,
+                          fontSize: 20.0,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ]),
           ),
@@ -339,21 +484,6 @@ class _CameraScreenState extends State<CameraScreen> {
                             children: <Widget>[
                               Text('Please hold for five(5) seconds'),
                               CameraPreview(cameraController!),
-                              Center(
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    if (isCapturing) // Display capture indicator when capturing an image
-                                      Column(
-                                        children: [
-                                          CircularProgressIndicator(),
-                                          SizedBox(height: 10),
-                                          Text('Classifying...'),
-                                        ],
-                                      ),
-                                  ],
-                                ),
-                              ),
                               Positioned(
                                 top: 60,
                                 left: 80,
@@ -371,8 +501,48 @@ class _CameraScreenState extends State<CameraScreen> {
                                   width: 250,
                                   height: 350,
                                   child: Column(children: [
-                                    Text(
-                                      'Prediction: $prediction',
+                                    Center(
+                                      child: Container(
+                                        width: double.infinity,
+                                        height: 30,
+                                        decoration: BoxDecoration(
+                                            color:
+                                                Colors.white.withOpacity(0.5)),
+                                        child: Text(
+                                          'Prediction: $prediction',
+                                          style: GoogleFonts.roboto(
+                                            color: Colors.black,
+                                            fontSize: 20.0,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    Center(
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          if (isCapturing) // Display capture indicator when capturing an image
+                                            Column(
+                                              children: [
+                                                SizedBox(
+                                                  height: 100,
+                                                ),
+                                                CircularProgressIndicator(),
+                                                SizedBox(height: 10),
+                                                Text(
+                                                  'Classifying...',
+                                                  style: GoogleFonts.roboto(
+                                                    color: Colors.white,
+                                                    fontSize: 20.0,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                        ],
+                                      ),
                                     ),
                                   ]),
                                 ),
@@ -380,12 +550,26 @@ class _CameraScreenState extends State<CameraScreen> {
                             ],
                           ),
                         ),
-                        TextButton(
-                            onPressed: (() {
-                              timer?.cancel();
-                              _showDialog();
-                            }),
-                            child: Text('View Result'))
+                        SizedBox(
+                          width: 150,
+                          height: 50,
+                          child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.white,
+                              ),
+                              onPressed: (() {
+                                timer?.cancel();
+                                _showDialog();
+                              }),
+                              child: Text(
+                                'View Result',
+                                style: GoogleFonts.roboto(
+                                  color: Colors.green[900],
+                                  fontSize: 20.0,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              )),
+                        )
                       ],
                     ),
                   ),
