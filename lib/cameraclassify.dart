@@ -63,7 +63,7 @@ class _CameraScreenState extends State<CameraScreen> {
     );
   }
 
-  //This code will capture still image in front of the camera. 
+  //This code will capture still image in front of the camera.
   void classifyStillImage() async {
     if (cameraController!.value.isTakingPicture) return;
     if (timer?.isActive == false)
@@ -129,8 +129,8 @@ class _CameraScreenState extends State<CameraScreen> {
       throw Exception('Recommendation not found for class: $className');
     }
   }
-  
-  //This dialog will show once the user clicks view result. 
+
+  //This dialog will show once the user clicks view result.
   //The result includes the captured image, prediction class, foliar fertilizer recommendation and confidence level
   void _showDialog() {
     showDialog(
@@ -354,6 +354,7 @@ class _CameraScreenState extends State<CameraScreen> {
                                     classificationData['imagePath'] as String,
                                 captureTime: classificationData['captureTime']
                                     as DateTime,
+                                synced: true,
                               );
                               if (primaryKey != -1) {
                                 setState(() {
@@ -424,7 +425,7 @@ class _CameraScreenState extends State<CameraScreen> {
     if (!isCameraReady) {
       return Container(); // Return an empty container while camera is initializing
     }
-    
+
     //This code builds the front end of the camera classify screen
     //It will show the camera preview
     //Automatically captures the image and classify it
