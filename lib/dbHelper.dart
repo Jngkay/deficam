@@ -58,11 +58,15 @@ class DBHelper {
     });
     final isConnected = await isInternetConnected();
     if (isConnected) {
+      
       // Attempt to sync data with Firestore
       try {
+        
         await syncDataWithFirestore();
-        print(
-            'You have access to the internet.Your data is saved locally and sync in the firestore');
+        
+        //Check if data has been saved
+        print('You have access to the internet.Your data is saved locally and sync in the firestore');
+        
         // Mark the data as synced in the local database after successful sync
         await markDataAsSynced(result);
       } catch (e) {
@@ -91,29 +95,17 @@ class DBHelper {
 
       for (var data in unsyncedData) {
         try {
+          
           // Add the data to Firestore and get the document reference
           var documentRerference = await FirebaseFirestore.instance
               .collection('imageClassificationData')
               .add(data);
-
-         // String imagePath = data['imagePath'];
-         // File imageFile = File(imagePath);
-
-        //  String imageName = 'image_${data['id']}.jpg';
-         // Reference storageReference =
-          //    FirebaseStorage.instance.ref().child(imageName);
-              
-         // await storageReference.putFile(imageFile);
-         // String downloadURL = await storageReference.getDownloadURL();
-
-         // data['imageURL'] = downloadURL;
 
           // Update the synced field in the Firestore document to 1
           await documentRerference.update({'synced': 1});
 
           // Mark the data as synced in the local database
           await markDataAsSynced(data['id']);
-         // imageFile.deleteSync();
 
           //This is to check that data has been successfully synced
           print('Data synced successfully: ${data['id']}');
