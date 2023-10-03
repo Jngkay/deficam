@@ -1,36 +1,26 @@
 {
   "project_info": {
-    "project_number": "1088817475893",
-    "project_id": "deficamdb-9914b",
-    "storage_bucket": "deficamdb-9914b.appspot.com"
+    "project_number": "419126280009",
+    "project_id": "nutricheck-355ac",
+    "storage_bucket": "nutricheck-355ac.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:1088817475893:android:1497aa12453fce51ea1c7c",
+        "mobilesdk_app_id": "1:419126280009:android:ccd1c697404048d7fa6498",
         "android_client_info": {
-          "package_name": "com.example.classify"
+          "package_name": "com.nutri.check"
         }
       },
-      "oauth_client": [
-        {
-          "client_id": "1088817475893-2dsquh8vcjfh8ijec0u92f8dspkr9ful.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
+      "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyDT0p2-sFzduuZdGJSkOmXkPiYiT75ne-A"
+          "current_key": "AIzaSyDvsKwu6rMEzJqWONs3zLsScbNIcC2GmjA"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "1088817475893-2dsquh8vcjfh8ijec0u92f8dspkr9ful.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
+          "other_platform_oauth_client": []
         }
       }
     }
