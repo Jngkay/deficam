@@ -98,9 +98,11 @@ class DBHelper {
 
           String imagePath = data['imagePath'];
           File imageFile = File(imagePath);
+
           String imageName = 'image_${data['id']}.jpg';
           Reference storageReference =
               FirebaseStorage.instance.ref().child(imageName);
+              
           await storageReference.putFile(imageFile);
           String downloadURL = await storageReference.getDownloadURL();
 
