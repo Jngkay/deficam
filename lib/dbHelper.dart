@@ -96,24 +96,24 @@ class DBHelper {
               .collection('imageClassificationData')
               .add(data);
 
-          String imagePath = data['imagePath'];
-          File imageFile = File(imagePath);
+         // String imagePath = data['imagePath'];
+         // File imageFile = File(imagePath);
 
-          String imageName = 'image_${data['id']}.jpg';
-          Reference storageReference =
-              FirebaseStorage.instance.ref().child(imageName);
+        //  String imageName = 'image_${data['id']}.jpg';
+         // Reference storageReference =
+          //    FirebaseStorage.instance.ref().child(imageName);
               
-          await storageReference.putFile(imageFile);
-          String downloadURL = await storageReference.getDownloadURL();
+         // await storageReference.putFile(imageFile);
+         // String downloadURL = await storageReference.getDownloadURL();
 
-          data['imageURL'] = downloadURL;
+         // data['imageURL'] = downloadURL;
 
           // Update the synced field in the Firestore document to 1
           await documentRerference.update({'synced': 1});
 
           // Mark the data as synced in the local database
           await markDataAsSynced(data['id']);
-          imageFile.deleteSync();
+         // imageFile.deleteSync();
 
           //This is to check that data has been successfully synced
           print('Data synced successfully: ${data['id']}');
