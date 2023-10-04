@@ -31,6 +31,7 @@ class _CameraScreenState extends State<CameraScreen> {
   double? confidence;
   File? capturedImage;
   DateTime? captureTime;
+  bool isSaving = false;
 
   @override
   void initState() {
@@ -137,51 +138,10 @@ class _CameraScreenState extends State<CameraScreen> {
       context: context,
       barrierDismissible: false,
       builder: (BuildContext context) {
-        bool isSaving = false;
-        bool isSaved = false;
-
-        Future<void> saveResult() async {
-          setState(() {
-            isSaving = true; // Set the saving flag to true
-          });
-          await Future.delayed(Duration(seconds: 2));
-
-          setState(() {
-            isSaving = false; // Set the saving flag to false
-            isSaved = true; // Set the saved flag to true
-          });
-
-          // Close the dialog after 1 second
-          Timer(Duration(seconds: 5), () {
-            Navigator.pop(context); // Close the dialog
-          });
-        }
-
         return Dialog(
           child: Container(
             padding: EdgeInsets.all(16),
             child: Column(mainAxisSize: MainAxisSize.min, children: [
-              if (isSaving)
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    SizedBox(
-                      width: 24,
-                      height: 24,
-                      child: CircularProgressIndicator(
-                        valueColor: AlwaysStoppedAnimation<Color>(Colors.black),
-                        strokeWidth: 2.0,
-                      ),
-                    ),
-                    SizedBox(width: 10),
-                    Text('Saving...'),
-                  ],
-                ),
-              if (isSaved)
-                Text(
-                  'Saved',
-                  style: TextStyle(color: Colors.green),
-                ),
               Text(
                 'Classification Result',
                 textAlign: TextAlign.left,
@@ -322,6 +282,15 @@ class _CameraScreenState extends State<CameraScreen> {
               SizedBox(
                 height: 30,
               ),
+
+              //Loading Widget
+              if (isSaving)
+                Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: CircularProgressIndicator(),
+                ),
+
+              //Save Button
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -335,6 +304,7 @@ class _CameraScreenState extends State<CameraScreen> {
                       onPressed: isSaving
                           ? null
                           : () async {
+                              print("Saving Started");
                               setState(() {
                                 isSaving = true;
                               });
@@ -357,9 +327,9 @@ class _CameraScreenState extends State<CameraScreen> {
                                 synced: true,
                               );
                               if (primaryKey != -1) {
+                                print("Saving successful");
                                 setState(() {
                                   isSaving = false;
-                                  isSaved = true;
                                 });
                                 Timer(Duration(seconds: 2), () {
                                   Navigator.pop(context);
