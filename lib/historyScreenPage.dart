@@ -5,6 +5,7 @@ import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'dbHelper.dart';
+import 'package:intl/intl.dart';
 
 class historyPage extends StatefulWidget {
   const historyPage({super.key});
@@ -15,6 +16,12 @@ class historyPage extends StatefulWidget {
 
 class _historyPageState extends State<historyPage> {
   late Future<List<Map<String, dynamic>>> _data;
+
+  String formatDate(String inputDate) {
+    DateTime parsedDate = DateTime.parse(inputDate);
+    DateFormat formatter = DateFormat('MMM d, yyyy');
+    return formatter.format(parsedDate);
+  }
 
   @override
   void initState() {
@@ -40,9 +47,11 @@ class _historyPageState extends State<historyPage> {
                 itemCount: snapshot.data!.length,
                 itemBuilder: (context, index) {
                   var item = snapshot.data![index];
+                  String formattedDate = formatDate('${item['captureTime']}');
                   return ListTile(
                     title: Text('Prediction: ${item['prediction']}'),
                     subtitle: Text('Confidence: ${item['confidence']}'),
+                    trailing: Text('Date $formattedDate'),
                   );
                 },
               ),
