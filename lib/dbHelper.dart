@@ -58,15 +58,14 @@ class DBHelper {
     });
     final isConnected = await isInternetConnected();
     if (isConnected) {
-      
       // Attempt to sync data with Firestore
       try {
-        
         await syncDataWithFirestore();
-        
+
         //Check if data has been saved
-        print('You have access to the internet.Your data is saved locally and sync in the firestore');
-        
+        print(
+            'You have access to the internet.Your data is saved locally and sync in the firestore');
+
         // Mark the data as synced in the local database after successful sync
         await markDataAsSynced(result);
       } catch (e) {
@@ -95,7 +94,6 @@ class DBHelper {
 
       for (var data in unsyncedData) {
         try {
-          
           // Add the data to Firestore and get the document reference
           var documentRerference = await FirebaseFirestore.instance
               .collection('imageClassificationData')
@@ -134,5 +132,14 @@ class DBHelper {
       where: 'id = ?',
       whereArgs: [id],
     );
+  }
+
+  //This code is to retrieve all data inside the db file
+  static Future<List<Map<String, dynamic>>> getAllRows() async {
+    final db = await database;
+    final List<Map<String, dynamic>> allRows =
+        await db!.query('classification_result');
+        print(allRows);
+    return allRows;
   }
 }

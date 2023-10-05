@@ -5,6 +5,7 @@ import 'package:deficam/camscreen.dart';
 import 'package:deficam/classifyScreen.dart';
 import 'package:deficam/didyouknowScreen.dart';
 import 'package:deficam/historyScreen.dart';
+import 'package:deficam/historyScreenPage.dart';
 import 'package:deficam/main.dart';
 import 'package:deficam/reportsScreen.dart';
 import 'package:flutter/material.dart';
@@ -256,7 +257,7 @@ class _dashboardScreenState extends State<dashboardScreen> {
                                         context,
                                         MaterialPageRoute(
                                             builder: (_) =>
-                                                DataTableHistory()));
+                                                historyPage()));
                                   },
                                   child: Container(
                                     decoration: BoxDecoration(

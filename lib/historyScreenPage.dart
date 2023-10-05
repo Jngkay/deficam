@@ -1,8 +1,10 @@
 import 'package:deficam/dashboardScreen.dart';
+import 'package:deficam/dbHelper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'dbHelper.dart';
 
 class historyPage extends StatefulWidget {
   const historyPage({super.key});
@@ -12,7 +14,48 @@ class historyPage extends StatefulWidget {
 }
 
 class _historyPageState extends State<historyPage> {
+  late Future<List<Map<String, dynamic>>> _data;
+
   @override
+  void initState() {
+    super.initState();
+    _data = DBHelper.getAllRows();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: FutureBuilder<List<Map<String, dynamic>>>(
+        future: _data,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return Center(child: Text('No data available.'));
+          } else {
+            return Container(
+              child: ListView.builder(
+                itemCount: snapshot.data!.length,
+                itemBuilder: (context, index) {
+                  var item = snapshot.data![index];
+                  return ListTile(
+                    title: Text('Prediction: ${item['prediction']}'),
+                    subtitle: Text('Confidence: ${item['confidence']}'),
+                  );
+                },
+              ),
+            );
+          }
+        },
+      ),
+    );
+  }
+}
+
+
+  /*@override
   GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
   @override
   Widget build(BuildContext context) {
@@ -79,6 +122,45 @@ class _historyPageState extends State<historyPage> {
                             ),
                           ],
                         ),
+                        Expanded(
+                          child: SingleChildScrollView(
+                            child: Column(
+                              children: [
+                                FutureBuilder<List<Map<String, dynamic>>>(
+                                  future: _data,
+                                  builder: (context, snapshot) {
+                                    if (snapshot.connectionState ==
+                                        ConnectionState.waiting) {
+                                      return Center(
+                                          child: CircularProgressIndicator());
+                                    } else if (snapshot.hasError) {
+                                      return Center(
+                                          child:
+                                              Text('Error: ${snapshot.error}'));
+                                    } else if (!snapshot.hasData ||
+                                        snapshot.data!.isEmpty) {
+                                      return Center(
+                                          child: Text('No data available.'));
+                                    } else {
+                                      return ListView.builder(
+                                        itemCount: snapshot.data!.length,
+                                        itemBuilder: (context, index) {
+                                          var item = snapshot.data![index];
+                                          return ListTile(
+                                            title: Text(
+                                                'Prediction: ${item['prediction']}'),
+                                            subtitle: Text(
+                                                'Confidence: ${item['confidence']}'),
+                                          );
+                                        },
+                                      );
+                                    }
+                                  },
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -108,4 +190,4 @@ class _historyPageState extends State<historyPage> {
       ),
     );
   }
-}
+  */
