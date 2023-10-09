@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:deficam/dashboardScreen.dart';
 import 'package:deficam/dbHelper.dart';
 import 'package:flutter/material.dart';
@@ -23,6 +25,12 @@ class _historyPageState extends State<historyPage> {
     return formatter.format(parsedDate);
   }
 
+  String formatTime(String inputTime) {
+    DateTime parsedTime = DateTime.parse(inputTime);
+    String formatter = DateFormat.jm().format(parsedTime);
+    return formatter;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -43,15 +51,33 @@ class _historyPageState extends State<historyPage> {
             return Center(child: Text('No data available.'));
           } else {
             return Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+              ),
               child: ListView.builder(
                 itemCount: snapshot.data!.length,
                 itemBuilder: (context, index) {
                   var item = snapshot.data![index];
                   String formattedDate = formatDate('${item['captureTime']}');
+                  String formattedTime = formatTime('${item['captureTime']}');
+                  String imagePath = '${item['imagePath']}';
                   return ListTile(
+                    leading: Image.file(
+                      File(imagePath),
+                      width: 50,
+                      height: 50,
+                      fit: BoxFit.cover,
+                    ),
                     title: Text('Prediction: ${item['prediction']}'),
                     subtitle: Text('Confidence: ${item['confidence']}'),
-                    trailing: Text('Date $formattedDate'),
+                    trailing: //Text('Date $formattedDate'
+                        Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: <Widget>[
+                          Text('$formattedDate'),
+                          Text('$formattedTime'),
+                        ]),
                   );
                 },
               ),
