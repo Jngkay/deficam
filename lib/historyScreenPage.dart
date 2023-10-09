@@ -31,6 +31,11 @@ class _historyPageState extends State<historyPage> {
     return formatter;
   }
 
+  String formatPercentage(double inputpercentage) {
+    String percentage = (inputpercentage * 100).toStringAsFixed(1) + '%';
+    return percentage;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -153,9 +158,155 @@ class _historyPageState extends State<historyPage> {
                             ),
                           ],
                         ),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 30, right: 30),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              ElevatedButton(
+                                  onPressed: () {}, child: Text('Sorts'))
+                            ],
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.only(left: 20, right: 20),
+                          child: Column(
+                            children: [
+                              SingleChildScrollView(
+                                child: Container(
+                                  height: 650,
+                                  child:
+                                      FutureBuilder<List<Map<String, dynamic>>>(
+                                    future: _data,
+                                    builder: (context, snapshot) {
+                                      if (snapshot.connectionState ==
+                                          ConnectionState.waiting) {
+                                        return Center(
+                                            child: CircularProgressIndicator());
+                                      } else if (snapshot.hasError) {
+                                        return Center(
+                                            child: Text(
+                                                'Error: ${snapshot.error}'));
+                                      } else if (!snapshot.hasData ||
+                                          snapshot.data!.isEmpty) {
+                                        return Center(
+                                            child: Text('No data available.'));
+                                      } else {
+                                        return Container(
+                                          child: ListView.builder(
+                                            itemCount: snapshot.data!.length,
+                                            itemBuilder: (context, index) {
+                                              var item = snapshot.data![index];
+                                              String formattedDate = formatDate(
+                                                  '${item['captureTime']}');
+                                              String formattedTime = formatTime(
+                                                  '${item['captureTime']}');
+                                              String imagePath =
+                                                  '${item['imagePath']}';
 
+                                              double confidence =
+                                                  item['confidence'];
 
-                        Padding(padding: EdgeInsets.all(20), child: ,)
+                                              String formattedPercentage =
+                                                  NumberFormat.percentPattern(
+                                                          'en_US')
+                                                      .format(confidence);
+
+                                              return Padding(
+                                                padding: const EdgeInsets.only(
+                                                    left: 8,
+                                                    right: 8,
+                                                    bottom: 8),
+                                                child: Container(
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.white,
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            10), // Border radius
+                                                    boxShadow: [
+                                                      BoxShadow(
+                                                        color: Color.fromARGB(
+                                                                255,
+                                                                137,
+                                                                136,
+                                                                136)
+                                                            .withOpacity(
+                                                                0.3), // Shadow color
+                                                        spreadRadius:
+                                                            2, // Spread radius
+                                                        blurRadius:
+                                                            5, // Blur radius
+                                                        offset: Offset(1,
+                                                            2), // Offset in x and y direction
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  child: ListTile(
+                                                    leading: Image.file(
+                                                      File(imagePath),
+                                                      width: 50,
+                                                      height: 50,
+                                                      fit: BoxFit.cover,
+                                                    ),
+                                                    title: Text(
+                                                      'Prediction: ${item['prediction']}',
+                                                      style: GoogleFonts.roboto(
+                                                          color: Colors.black,
+                                                          fontSize: 18.0,
+                                                          fontWeight:
+                                                              FontWeight.bold),
+                                                    ),
+                                                    subtitle: Text(
+                                                      'Confidence: $formattedPercentage',
+                                                      style: GoogleFonts.roboto(
+                                                          fontSize: 14.0,
+                                                          fontWeight: FontWeight
+                                                              .normal),
+                                                    ),
+                                                    trailing: //Text('Date $formattedDate'
+                                                        Column(
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .center,
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .end,
+                                                            children: <Widget>[
+                                                          Text(
+                                                            '$formattedDate',
+                                                            style: GoogleFonts.roboto(
+                                                                color: Colors
+                                                                    .black,
+                                                                fontSize: 16.0,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .normal),
+                                                          ),
+                                                          Text(
+                                                            '$formattedTime',
+                                                            style: GoogleFonts.roboto(
+                                                                color: Colors
+                                                                    .black,
+                                                                fontSize: 13.0,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .normal),
+                                                          ),
+                                                        ]),
+                                                  ),
+                                                ),
+                                              );
+                                            },
+                                          ),
+                                        );
+                                      }
+                                    },
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                       ],
                     ),
                   ),
