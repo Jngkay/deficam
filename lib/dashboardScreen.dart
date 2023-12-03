@@ -7,6 +7,7 @@ import 'package:deficam/didyouknowScreen.dart';
 import 'package:deficam/historyScreen.dart';
 import 'package:deficam/historyScreenPage.dart';
 import 'package:deficam/main.dart';
+import 'package:deficam/reportsSample.dart';
 import 'package:deficam/reportsScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -30,7 +31,7 @@ class _dashboardScreenState extends State<dashboardScreen> {
       onWillPop: _onWillPop,
       child: Scaffold(
         key: _scaffoldKey,
-       
+
         //Builds the dashboard board front end design
         body: Column(
           children: [
@@ -190,7 +191,7 @@ class _dashboardScreenState extends State<dashboardScreen> {
                                     Navigator.pushReplacement(
                                         context,
                                         MaterialPageRoute(
-                                            builder: (_) => ReportScreen()));
+                                            builder: (_) => reportsPage()));
                                   },
                                   child: Container(
                                     decoration: BoxDecoration(
@@ -256,8 +257,7 @@ class _dashboardScreenState extends State<dashboardScreen> {
                                     Navigator.pushReplacement(
                                         context,
                                         MaterialPageRoute(
-                                            builder: (_) =>
-                                                historyPage()));
+                                            builder: (_) => historyPage()));
                                   },
                                   child: Container(
                                     decoration: BoxDecoration(

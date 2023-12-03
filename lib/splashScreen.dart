@@ -21,6 +21,7 @@ class _splashScreenState extends State<splashScreen> {
         () => Navigator.pushReplacement(context,
             MaterialPageRoute(builder: (context) => dashboardScreen())));
   }
+
   // This builds the front end design of the Splashscreen
   @override
   Widget build(BuildContext context) {
