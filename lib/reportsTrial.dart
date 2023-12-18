@@ -261,18 +261,54 @@ class _LineChartSampleState extends State<LineChartSample> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                foregroundColor: Colors.white,
+                                backgroundColor: Color(0xffEF5241),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(5),
+                                ),
+                              ),
                               onPressed: () => updateData('nitrogen'),
-                              child: Text('Nitrogen'),
+                              child: Text(
+                                'Nitrogen',
+                                style: GoogleFonts.roboto(
+                                    fontSize: 18.0,
+                                    fontWeight: FontWeight.w600),
+                              ),
                             ),
                             SizedBox(width: 10),
                             ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                foregroundColor: Colors.white,
+                                backgroundColor: Color(0xff4C241B),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(5),
+                                ),
+                              ),
                               onPressed: () => updateData('healthy'),
-                              child: Text('Healthy'),
+                              child: Text(
+                                'Healthy',
+                                style: GoogleFonts.roboto(
+                                    fontSize: 18.0,
+                                    fontWeight: FontWeight.w600),
+                              ),
                             ),
                             SizedBox(width: 10),
                             ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                foregroundColor: Colors.white,
+                                backgroundColor: Color(0xffBB521F),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(5),
+                                ),
+                              ),
                               onPressed: () => updateData('potassium'),
-                              child: Text('Potassium'),
+                              child: Text(
+                                'Potassium',
+                                style: GoogleFonts.roboto(
+                                    fontSize: 18.0,
+                                    fontWeight: FontWeight.w600),
+                              ),
                             ),
                           ],
                         ),

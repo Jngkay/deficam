@@ -1,3 +1,4 @@
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/src/widgets/container.dart';
@@ -15,6 +16,8 @@ class infoScreen extends StatefulWidget {
 
 class _infoScreenState extends State<infoScreen> {
   GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
+  bool showTutorial = true;
+  CarouselController carouselController = CarouselController();
 
   @override
   Widget build(BuildContext context) {
@@ -83,106 +86,241 @@ class _infoScreenState extends State<infoScreen> {
                         ),
                         Column(
                           children: [
-                            SizedBox(
-                              height: 30,
-                            ),
+                            SizedBox(height: 30),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
-                                Container(
-                                  width: 150,
-                                  height: 60,
-                                  child: ElevatedButton.icon(
-                                    onPressed: () {},
-                                    icon: Image.asset(
-                                      'assets/icons/tutorial_icon.png',
-                                      width: 40,
-                                      height: 40,
+                                ElevatedButton.icon(
+                                  onPressed: () {
+                                    setState(() {
+                                      showTutorial = true;
+                                    });
+                                  },
+                                  icon: Image.asset(
+                                    'assets/icons/tutorial_icon.png',
+                                    width: 25,
+                                    height: 25,
+                                  ),
+                                  label: Text(
+                                    'Tutorial',
+                                    style: TextStyle(fontSize: 20),
+                                  ),
+                                  style: ElevatedButton.styleFrom(
+                                    foregroundColor:
+                                        Color.fromARGB(255, 0, 0, 0),
+                                    backgroundColor:
+                                        Color.fromARGB(255, 255, 255, 255),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(20),
                                     ),
-                                    label: Text(
-                                      'Tutorial',
-                                      style: TextStyle(fontSize: 20),
-                                    ),
-                                    style: ElevatedButton.styleFrom(
-                                        foregroundColor: Color.fromARGB(
-                                            255, 0, 0, 0), // background
-                                        backgroundColor: Color.fromARGB(
-                                            255, 255, 255, 255), // foreground
-                                        shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(20))),
                                   ),
                                 ),
-                                Container(
-                                  width: 150,
-                                  height: 60,
-                                  child: ElevatedButton.icon(
-                                    onPressed: () {},
-                                    icon: Image.asset(
-                                      'assets/icons/trivia_icon.png',
-                                      width: 40,
-                                      height: 40,
+                                ElevatedButton.icon(
+                                  onPressed: () {
+                                    setState(() {
+                                      showTutorial = false;
+                                    });
+                                  },
+                                  icon: Image.asset(
+                                    'assets/icons/trivia_icon.png',
+                                    width: 25,
+                                    height: 25,
+                                  ),
+                                  label: Text(
+                                    'Trivia',
+                                    style: TextStyle(fontSize: 20),
+                                  ),
+                                  style: ElevatedButton.styleFrom(
+                                    foregroundColor:
+                                        Color.fromARGB(255, 0, 0, 0),
+                                    backgroundColor:
+                                        Color.fromARGB(255, 255, 255, 255),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(20),
                                     ),
-                                    label: Text(
-                                      'Trivia',
-                                      style: TextStyle(fontSize: 20),
-                                    ),
-                                    style: ElevatedButton.styleFrom(
-                                        foregroundColor: Color.fromARGB(
-                                            255, 0, 0, 0), // background
-                                        backgroundColor: Color.fromARGB(
-                                            255, 255, 255, 255), // foreground
-                                        shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(20))),
                                   ),
                                 ),
                               ],
                             ),
-                            SizedBox(
-                              height: 20,
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Container(
-                                  child: Image.asset(
-                                    'assets/icons/pic_infobg.png',
-                                    width: 400,
-                                    height: 400,
+                            SizedBox(height: 20),
+                            Visibility(
+                              visible: showTutorial,
+                              child: Column(
+                                children: [
+                                  // Tutorial content
+                                  // Add your tutorial widgets here
+
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      IconButton(
+                                        color: Colors.white,
+                                        icon: Icon(Icons.arrow_back_ios),
+                                        onPressed: () {
+                                          carouselController.previousPage();
+                                        },
+                                      ),
+                                      Text(
+                                        'Welcome to the Tutorial!',
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 30,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      IconButton(
+                                        color: Colors.white,
+                                        icon: Icon(Icons.arrow_forward_ios),
+                                        onPressed: () {
+                                          carouselController.nextPage();
+                                        },
+                                      ),
+                                    ],
                                   ),
-                                )
-                              ],
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  'Welcome',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 50,
-                                    fontWeight: FontWeight.bold,
+                                  CarouselSlider(
+                                    items: [
+                                      Container(
+                                        margin: EdgeInsets.all(6.0),
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(8.0),
+                                          image: DecorationImage(
+                                            image: AssetImage(
+                                                "assets/tutorial/dashboard.jpg"),
+                                            fit: BoxFit.fitHeight,
+                                          ),
+                                        ),
+                                      ),
+                                      Container(
+                                        margin: EdgeInsets.all(6.0),
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(8.0),
+                                          image: DecorationImage(
+                                            image: AssetImage(
+                                                "assets/tutorial/report.jpg"),
+                                            fit: BoxFit.fitHeight,
+                                          ),
+                                        ),
+                                      ),
+                                      Container(
+                                        margin: EdgeInsets.all(6.0),
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(8.0),
+                                          image: DecorationImage(
+                                            image: AssetImage(
+                                                "assets/tutorial/report.jpg"),
+                                            fit: BoxFit.fitHeight,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                    options: CarouselOptions(
+                                      height:
+                                          MediaQuery.of(context).size.height *
+                                              0.60,
+                                      enlargeCenterPage: true,
+                                      autoPlay: true,
+                                      aspectRatio: 16 / 9,
+                                      autoPlayCurve: Curves.fastOutSlowIn,
+                                      enableInfiniteScroll: true,
+                                      autoPlayAnimationDuration:
+                                          Duration(milliseconds: 800),
+                                      viewportFraction: 0.8,
+                                    ),
+                                    carouselController: carouselController,
                                   ),
-                                )
-                              ],
-                            ),
-                            SizedBox(
-                              height: 20,
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  'Explore our tutorial to learn how to use our\n mobile application  and discover interesting facts\n about mango plants.\nStart your journey towards healthier crops today!',
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.normal,
+                                  // Add more tutorial content here
+                                ],
+                              ),
+                              replacement: Column(
+                                children: [
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      IconButton(
+                                        color: Colors.white,
+                                        icon: Icon(Icons.arrow_back_ios),
+                                        onPressed: () {
+                                          carouselController.previousPage();
+                                        },
+                                      ),
+                                      Text(
+                                        'Trivia 101',
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 30,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      IconButton(
+                                        color: Colors.white,
+                                        icon: Icon(Icons.arrow_forward_ios),
+                                        onPressed: () {
+                                          carouselController.nextPage();
+                                        },
+                                      ),
+                                    ],
                                   ),
-                                )
-                              ],
+                                  CarouselSlider(
+                                    items: [
+                                      Container(
+                                        margin: EdgeInsets.all(6.0),
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(8.0),
+                                          image: DecorationImage(
+                                            image: AssetImage(
+                                                "assets/trivia/trivia1.png"),
+                                            fit: BoxFit.fitWidth,
+                                          ),
+                                        ),
+                                      ),
+                                      Container(
+                                        margin: EdgeInsets.all(6.0),
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(8.0),
+                                          image: DecorationImage(
+                                            image: AssetImage(
+                                                "assets/trivia/trivia2.png"),
+                                            fit: BoxFit.fitWidth,
+                                          ),
+                                        ),
+                                      ),
+                                      Container(
+                                        margin: EdgeInsets.all(6.0),
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(8.0),
+                                          image: DecorationImage(
+                                            image: AssetImage(
+                                                "assets/trivia/trivia3.png"),
+                                            fit: BoxFit.fitWidth,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                    options: CarouselOptions(
+                                      height:
+                                          MediaQuery.of(context).size.height *
+                                              0.60,
+                                      enlargeCenterPage: true,
+                                      autoPlay: true,
+                                      aspectRatio: 16 / 9,
+                                      autoPlayCurve: Curves.fastOutSlowIn,
+                                      enableInfiniteScroll: true,
+                                      autoPlayAnimationDuration:
+                                          Duration(milliseconds: 800),
+                                      viewportFraction: 0.8,
+                                    ),
+                                    carouselController: carouselController,
+                                  ),
+                                ],
+                              ),
                             ),
                           ],
                         ),

@@ -64,6 +64,8 @@ dependencies:
   sqflite: ^2.2.8+4
   connectivity_plus: ^4.0.2
   fl_chart: ^0.62.0
+  carousel_slider: ^4.0.0
+
 
 
 dev_dependencies:
@@ -100,6 +102,8 @@ flutter:
     - assets/icons/
     - assets/logo/logo.png
     - assets/
+    - assets/trivia/
+    - assets/tutorial/
 
 
   # To add assets to your application, add an assets section, like this:
