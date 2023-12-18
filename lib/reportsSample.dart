@@ -181,7 +181,7 @@ LineChartBarData get lineChartBarData1 {
     return spots;
   }
 
-  List<FlSpot> fetchedSpots = fetchDataFromFirestore();
+  List<FlSpot> fetchedSpots = fetchDataFromFirestore() as List<FlSpot>;
 
   return LineChartBarData(
     isCurved: true,
