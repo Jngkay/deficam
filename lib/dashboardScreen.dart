@@ -219,7 +219,7 @@ class _dashboardScreenState extends State<dashboardScreen> {
                                           children: [
                                             Container(
                                               margin: EdgeInsets.fromLTRB(
-                                                  35, 35, 7, 0),
+                                                  20, 35, 22, 0),
                                               width: 60.0,
                                               child: Image.asset(
                                                   'assets/icons/classify_icon.png'),
@@ -259,8 +259,7 @@ class _dashboardScreenState extends State<dashboardScreen> {
                                     Navigator.pushReplacement(
                                         context,
                                         MaterialPageRoute(
-                                            builder: (_) =>
-                                                LineChartSample()));
+                                            builder: (_) => LineChartSample()));
                                   },
                                   child: Container(
                                     decoration: BoxDecoration(
@@ -286,7 +285,7 @@ class _dashboardScreenState extends State<dashboardScreen> {
                                           children: [
                                             Container(
                                               margin: EdgeInsets.fromLTRB(
-                                                  35, 35, 7, 0),
+                                                  20, 35, 22, 0),
                                               width: 60.0,
                                               child: Image.asset(
                                                   'assets/icons/reports_icon.png'),
@@ -362,7 +361,7 @@ class _dashboardScreenState extends State<dashboardScreen> {
                                           children: [
                                             Container(
                                               margin: EdgeInsets.fromLTRB(
-                                                  35, 35, 7, 0),
+                                                  20, 35, 22, 0),
                                               width: 60.0,
                                               child: Image.asset(
                                                   'assets/icons/history_icon.png'),
@@ -428,7 +427,7 @@ class _dashboardScreenState extends State<dashboardScreen> {
                                           children: [
                                             Container(
                                               margin: EdgeInsets.fromLTRB(
-                                                  35, 35, 7, 0),
+                                                  20, 35, 22, 0),
                                               width: 60.0,
                                               child: Image.asset(
                                                   'assets/icons/info_icon.png'),

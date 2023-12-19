@@ -37,16 +37,10 @@ class _splashScreenState extends State<splashScreen> {
           ),
           Container(
             width: 310,
-            child: Image.asset('assets/logo/logo-new.png'),
+            child: Image.asset('assets/logo/logowname.png'),
           ),
           Container(
-            width: 350,
-            child: Image.asset(
-              'assets/logo/name.png',
-            ),
-          ),
-          Container(
-            height: 180,
+            height: 200,
           ),
           Center(
               child: LoadingAnimationWidget.prograssiveDots(
@@ -58,7 +52,7 @@ class _splashScreenState extends State<splashScreen> {
                 'GROW WITH EASE',
                 style: TextStyle(
                   color: Colors.black,
-                  fontSize: 25,
+                  fontSize: 20,
                   decoration: TextDecoration.none,
                 ),
               ),
@@ -68,10 +62,10 @@ class _splashScreenState extends State<splashScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                'healthy trees guarantees',
+                'healthy trees guarantee',
                 style: TextStyle(
                   color: Color(0xff2F272A),
-                  fontSize: 15,
+                  fontSize: 13,
                   decoration: TextDecoration.none,
                 ),
               ),

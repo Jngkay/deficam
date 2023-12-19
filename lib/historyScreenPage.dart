@@ -16,8 +16,11 @@ class historyPage extends StatefulWidget {
   State<historyPage> createState() => _historyPageState();
 }
 
+enum SortType { byPrediction, byDate }
+
 class _historyPageState extends State<historyPage> {
   late Future<List<Map<String, dynamic>>> _data;
+  SortType _currentSortType = SortType.byDate;
 
   String formatDate(String inputDate) {
     DateTime parsedDate = DateTime.parse(inputDate);
@@ -34,6 +37,30 @@ class _historyPageState extends State<historyPage> {
   String formatPercentage(double inputpercentage) {
     String percentage = (inputpercentage * 100).toStringAsFixed(1) + '%';
     return percentage;
+  }
+
+  List<Map<String, dynamic>> _sortData(List<Map<String, dynamic>> data) {
+    List<Map<String, dynamic>> sortedData = List.from(data); // Create a copy
+
+    switch (_currentSortType) {
+      case SortType.byPrediction:
+        sortedData.sort((a, b) => a['prediction'].compareTo(b['prediction']));
+        break;
+      case SortType.byDate:
+        sortedData.sort((a, b) => DateTime.parse(b['captureTime'])
+            .compareTo(DateTime.parse(a['captureTime'])));
+        break;
+    }
+    return sortedData;
+  }
+
+  void _onSortPressed() {
+    setState(() {
+      // Toggle the sorting type between byDate and byPrediction
+      _currentSortType = _currentSortType == SortType.byDate
+          ? SortType.byPrediction
+          : SortType.byDate;
+    });
   }
 
   @override
@@ -163,8 +190,47 @@ class _historyPageState extends State<historyPage> {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: [
-                              ElevatedButton(
-                                  onPressed: () {}, child: Text('Sorts'))
+                              PopupMenuButton<SortType>(
+                                onSelected: (value) {
+                                  setState(() {
+                                    _currentSortType = value;
+                                  });
+                                },
+                                itemBuilder: (BuildContext context) =>
+                                    <PopupMenuEntry<SortType>>[
+                                  const PopupMenuItem<SortType>(
+                                    value: SortType.byPrediction,
+                                    child: Text(
+                                      'Sort by Prediction',
+                                      style: TextStyle(color: Colors.black),
+                                    ),
+                                  ),
+                                  const PopupMenuItem<SortType>(
+                                    value: SortType.byDate,
+                                    child: Text(
+                                      'Sort by Date',
+                                      style: TextStyle(color: Colors.black),
+                                    ),
+                                  ),
+                                ],
+                                child: ElevatedButton.icon(
+                                  icon: Icon(Icons.sort),
+                                  style: ElevatedButton.styleFrom(
+                                    foregroundColor: Color(0xFF2E9D33),
+                                    backgroundColor: Colors.white,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(5),
+                                    ),
+                                  ),
+                                  onPressed: _onSortPressed,
+                                  label: Text(
+                                    'Sort',
+                                    style: GoogleFonts.roboto(
+                                        fontSize: 15.0,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                              ),
                             ],
                           ),
                         ),
@@ -192,11 +258,14 @@ class _historyPageState extends State<historyPage> {
                                         return Center(
                                             child: Text('No data available.'));
                                       } else {
+                                        List<Map<String, dynamic>> sortedData =
+                                            _sortData(snapshot.data!);
+
                                         return Container(
                                           child: ListView.builder(
-                                            itemCount: snapshot.data!.length,
+                                            itemCount: sortedData.length,
                                             itemBuilder: (context, index) {
-                                              var item = snapshot.data![index];
+                                              var item = sortedData[index];
                                               String formattedDate = formatDate(
                                                   '${item['captureTime']}');
                                               String formattedTime = formatTime(

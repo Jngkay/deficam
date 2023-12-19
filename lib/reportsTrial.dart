@@ -6,6 +6,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 
 class LineChartSample extends StatefulWidget {
   @override
@@ -119,6 +120,12 @@ class _LineChartSampleState extends State<LineChartSample> {
     return Text(text, style: style, textAlign: TextAlign.left);
   }
 
+  String getCurrentDate() {
+    DateTime now = DateTime.now();
+    String formattedDate = DateFormat('MMMM dd, yyyy').format(now);
+    return formattedDate;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -199,7 +206,22 @@ class _LineChartSampleState extends State<LineChartSample> {
                           ],
                         ),
                         SizedBox(
-                          height: 10,
+                          height: 20,
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              'Report as of ${getCurrentDate()}',
+                              style: GoogleFonts.roboto(
+                                  color: Colors.black,
+                                  fontSize: 18.0,
+                                  fontWeight: FontWeight.w400),
+                            ),
+                          ],
+                        ),
+                        SizedBox(
+                          height: 20,
                         ),
                         Container(
                           height: MediaQuery.of(context).size.height * 0.60,
