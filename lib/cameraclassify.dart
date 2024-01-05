@@ -7,6 +7,7 @@ import 'dart:io';
 import 'package:camera/camera.dart';
 import 'package:deficam/dashboardScreen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_exit_app/flutter_exit_app.dart';
 import 'package:get/get_connect/http/src/utils/utils.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:path_provider/path_provider.dart';
@@ -297,7 +298,11 @@ class _CameraScreenState extends State<CameraScreen> {
                   SizedBox(
                     width: 120,
                     height: 50,
-                    child: ElevatedButton(
+                    child: ElevatedButton.icon(
+                      icon: Icon(
+                        Icons.save_alt_rounded,
+                        color: Colors.white,
+                      ),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.green,
                       ),
@@ -338,7 +343,7 @@ class _CameraScreenState extends State<CameraScreen> {
                                 print('Error saving result');
                               }
                             },
-                      child: Text(
+                      label: Text(
                         'Save',
                         style: GoogleFonts.roboto(
                           color: Colors.white,
@@ -352,9 +357,13 @@ class _CameraScreenState extends State<CameraScreen> {
                     width: 20,
                   ),
                   SizedBox(
-                    width: 100,
+                    width: 120,
                     height: 50,
-                    child: ElevatedButton(
+                    child: ElevatedButton.icon(
+                      icon: Icon(
+                        Icons.restart_alt_rounded,
+                        color: Colors.white,
+                      ),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.blue,
                       ),
@@ -363,7 +372,7 @@ class _CameraScreenState extends State<CameraScreen> {
                         timer?.cancel();
                         classifyStillImage();
                       },
-                      child: Text(
+                      label: Text(
                         'Retake',
                         style: GoogleFonts.roboto(
                           color: Colors.white,
@@ -392,6 +401,39 @@ class _CameraScreenState extends State<CameraScreen> {
 
   @override
   Widget build(BuildContext context) {
+    Future<bool> _onWillPop() async {
+      return (await showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: Text(
+                'Confirm Close',
+                style: GoogleFonts.roboto(
+                    fontWeight: FontWeight.bold, fontSize: 20),
+              ),
+              content: Text(
+                'Are you sure you want to close the application? Any unsaved changes will be lost.',
+                style: GoogleFonts.roboto(fontSize: 15),
+              ),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text('No',
+                      style: GoogleFonts.roboto(
+                          fontSize: 14, fontWeight: FontWeight.bold)),
+                ),
+                TextButton(
+                    child: Text('Yes',
+                        style: GoogleFonts.roboto(
+                            fontSize: 14, fontWeight: FontWeight.bold)),
+                    onPressed: () {
+                      FlutterExitApp.exitApp(iosForceExit: true);
+                    }),
+              ],
+            ),
+          )) ??
+          false;
+    }
+
     if (!isCameraReady) {
       return Container(); // Return an empty container while camera is initializing
     }
@@ -399,187 +441,211 @@ class _CameraScreenState extends State<CameraScreen> {
     //This code builds the front end of the camera classify screen
     //It will show the camera preview
     //Automatically captures the image and classify it
-    return Scaffold(
-      body: Column(
-        children: [
-          Container(
-            height: MediaQuery.of(context).size.height,
-            child: Stack(
-              children: <Widget>[
-                Positioned(
-                  top: 20,
-                  child: Container(
-                    color: Colors.white,
-                    width: MediaQuery.of(context).size.width,
-                    height: 100.0,
-                    child: Center(
-                      child: Text(
-                        "Classify",
-                        style: GoogleFonts.roboto(
-                            color: Colors.black,
-                            fontSize: 25.0,
-                            fontWeight: FontWeight.bold),
+    return WillPopScope(
+      onWillPop: _onWillPop,
+      child: Scaffold(
+        body: Column(
+          children: [
+            Container(
+              height: MediaQuery.of(context).size.height,
+              child: Stack(
+                children: <Widget>[
+                  Positioned(
+                    top: 20,
+                    child: Container(
+                      color: Colors.white,
+                      width: MediaQuery.of(context).size.width,
+                      height: 100.0,
+                      child: Center(
+                        child: Text(
+                          "Classify",
+                          style: GoogleFonts.roboto(
+                              color: Colors.black,
+                              fontSize: 25.0,
+                              fontWeight: FontWeight.bold),
+                        ),
                       ),
                     ),
                   ),
-                ),
-                Positioned(
-                  top: 100,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                          colors: [
-                            Color(0xFF88BF3B),
-                            Color(0xFF178F3E),
-                          ]),
-                      borderRadius: BorderRadius.only(
-                          topRight: Radius.circular(40),
-                          topLeft: Radius.circular(40)),
-                    ),
-                    width: MediaQuery.of(context).size.width,
-                    height: MediaQuery.of(context).size.height,
-                    child: Column(
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Container(
-                              padding: EdgeInsets.only(left: 5, top: 10),
-                              child: IconButton(
-                                color: Colors.white,
-                                icon: Icon(Icons.arrow_back_ios),
-                                iconSize: 20,
-                                onPressed: () {
-                                  cameraController?.pausePreview();
-                                  Navigator.push(context, MaterialPageRoute(
-                                      builder: (BuildContext) {
-                                    return dashboardScreen();
-                                  }));
-                                },
-                              ),
-                            ),
-                          ],
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(15.0),
-                          child: Stack(
-                            children: <Widget>[
-                              Text('Please hold for five(5) seconds'),
-                              CameraPreview(cameraController!),
-                              Positioned(
-                                top: 60,
-                                left: 80,
-                                right: 80,
-                                bottom: 60,
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    border: Border.all(
-                                      color: Colors
-                                          .red, // Customize the color of the border
-                                      width:
-                                          2.0, // Customize the width of the border
-                                    ),
-                                  ),
-                                  width: 250,
-                                  height: 350,
-                                  child: Column(children: [
-                                    Center(
-                                      child: Container(
-                                        width: double.infinity,
-                                        height: 30,
-                                        decoration: BoxDecoration(
-                                            color:
-                                                Colors.white.withOpacity(0.5)),
-                                        child: Text(
-                                          'Prediction: $prediction',
-                                          style: GoogleFonts.roboto(
-                                            color: Colors.black,
-                                            fontSize: 20.0,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    Center(
-                                      child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          if (isCapturing) // Display capture indicator when capturing an image
-                                            Column(
-                                              children: [
-                                                SizedBox(
-                                                  height: 100,
-                                                ),
-                                                CircularProgressIndicator(),
-                                                SizedBox(height: 10),
-                                                Text(
-                                                  'Classifying...',
-                                                  style: GoogleFonts.roboto(
-                                                    color: Colors.white,
-                                                    fontSize: 20.0,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                        ],
-                                      ),
-                                    ),
-                                  ]),
+                  Positioned(
+                    top: 100,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              Color(0xFF88BF3B),
+                              Color(0xFF178F3E),
+                            ]),
+                        borderRadius: BorderRadius.only(
+                            topRight: Radius.circular(40),
+                            topLeft: Radius.circular(40)),
+                      ),
+                      width: MediaQuery.of(context).size.width,
+                      height: MediaQuery.of(context).size.height,
+                      child: Column(
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Container(
+                                padding: EdgeInsets.only(left: 5, top: 10),
+                                child: IconButton(
+                                  color: Colors.white,
+                                  icon: Icon(Icons.arrow_back_ios),
+                                  iconSize: 20,
+                                  onPressed: () {
+                                    cameraController?.pausePreview();
+                                    Navigator.push(context, MaterialPageRoute(
+                                        builder: (BuildContext) {
+                                      return dashboardScreen();
+                                    }));
+                                  },
                                 ),
                               ),
                             ],
                           ),
-                        ),
-                        SizedBox(
-                          width: 150,
-                          height: 50,
-                          child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.white,
-                              ),
-                              onPressed: (() {
-                                timer?.cancel();
-                                _showDialog();
-                              }),
-                              child: Text(
-                                'View Result',
-                                style: GoogleFonts.roboto(
-                                  color: Colors.green[900],
-                                  fontSize: 20.0,
-                                  fontWeight: FontWeight.bold,
+                          Padding(
+                            padding: const EdgeInsets.all(15.0),
+                            child: Stack(
+                              children: <Widget>[
+                                Text('Please hold for five(5) seconds'),
+                                CameraPreview(cameraController!),
+                                Positioned(
+                                  top: 60,
+                                  left: 80,
+                                  right: 80,
+                                  bottom: 60,
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      border: Border.all(
+                                        color: Colors
+                                            .red, // Customize the color of the border
+                                        width:
+                                            2.0, // Customize the width of the border
+                                      ),
+                                    ),
+                                    width: 250,
+                                    height: 350,
+                                    child: Column(children: [
+                                      Center(
+                                        child: Container(
+                                          width: double.infinity,
+                                          height: 30,
+                                          decoration: BoxDecoration(
+                                              color: Colors.white
+                                                  .withOpacity(0.5)),
+                                          child: Text(
+                                            'Prediction: $prediction',
+                                            style: GoogleFonts.roboto(
+                                              color: Colors.black,
+                                              fontSize: 20.0,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      Center(
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            if (isCapturing) // Display capture indicator when capturing an image
+                                              Column(
+                                                children: [
+                                                  SizedBox(
+                                                    height: 100,
+                                                  ),
+                                                  CircularProgressIndicator(),
+                                                  SizedBox(height: 10),
+                                                  Text(
+                                                    'Classifying...',
+                                                    style: GoogleFonts.roboto(
+                                                      color: Colors.white,
+                                                      fontSize: 20.0,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                          ],
+                                        ),
+                                      ),
+                                    ]),
+                                  ),
                                 ),
-                              )),
-                        )
-                      ],
-                    ),
-                  ),
-                ),
-                Positioned(
-                  top: 60.0,
-                  left: 20.0,
-                  child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 20.0),
-                    child: DecoratedBox(
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(35),
-                          border: Border.all(color: Colors.white, width: 2.0),
-                          color: Colors.white),
-                      child: Image.asset(
-                        'assets/logo/logo.png',
-                        width: 80,
-                        height: 80,
+                              ],
+                            ),
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                'Please hold the camera steady.',
+                                style: GoogleFonts.roboto(
+                                  color: Colors.white,
+                                  fontSize: 18.0,
+                                  fontWeight: FontWeight.normal,
+                                ),
+                              )
+                            ],
+                          ),
+                          SizedBox(
+                            height: 20,
+                          ),
+                          SizedBox(
+                            width: 190,
+                            height: 50,
+                            child: ElevatedButton.icon(
+                                icon: Icon(
+                                  Icons.remove_red_eye_outlined,
+                                  color: Colors.green[900],
+                                ),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.white,
+                                ),
+                                onPressed: (() {
+                                  timer?.cancel();
+                                  _showDialog();
+                                }),
+                                label: Text(
+                                  'View Result',
+                                  style: GoogleFonts.roboto(
+                                    color: Colors.green[900],
+                                    fontSize: 20.0,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                )),
+                          )
+                        ],
                       ),
                     ),
                   ),
-                ),
-              ],
+                  Positioned(
+                    top: 60.0,
+                    left: 20.0,
+                    child: Container(
+                      padding: EdgeInsets.symmetric(horizontal: 20.0),
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(35),
+                            border: Border.all(color: Colors.white, width: 2.0),
+                            color: Colors.white),
+                        child: Image.asset(
+                          'assets/logo/logo.png',
+                          width: 80,
+                          height: 80,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
