@@ -1,5 +1,4 @@
-//This is the current and working camera clasify screen
-//Continue to update this code
+//this is a backup only
 
 import 'dart:async';
 import 'dart:convert';
@@ -16,6 +15,7 @@ import 'package:flutter/services.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:intl/intl.dart';
 import 'package:deficam/dbHelper.dart';
+import 'package:tflite_flutter/tflite_flutter.dart';
 
 class CameraScreen extends StatefulWidget {
   @override
@@ -34,11 +34,24 @@ class _CameraScreenState extends State<CameraScreen> {
   DateTime? captureTime;
   bool isSaving = false;
 
+  late Interpreter cnnInterpreter;
+  late Interpreter svmInterpreter;
+  bool isInterpreting = false;
+
   @override
   void initState() {
     super.initState();
     initializeCamera();
     loadModel();
+  }
+
+  @override
+  void dispose() {
+    cameraController?.pausePreview();
+    timer?.cancel();
+    Tflite.close();
+    svmInterpreter.close(); // Close the SVM interpreter
+    super.dispose();
   }
 
   //This code will initiliaze the camera and in every 3 seconds it will classify the leaf image
@@ -53,69 +66,140 @@ class _CameraScreenState extends State<CameraScreen> {
     setState(() {
       isCameraReady = true;
     });
-
+    await loadSvmModel();
     timer = Timer(Duration(seconds: 3), classifyStillImage);
   }
 
   //This code will load the tflite model as well as the class labels
   Future<void> loadModel() async {
-    await Tflite.loadModel(
-      model: 'assets/model.tflite',
-      labels: 'assets/labels.txt',
-    );
+    print('Loading CNN model...');
+    try {
+      await Tflite.loadModel(
+        model: 'assets/model/v1_cnn_model.tflite',
+        labels: 'assets/labels.txt',
+      );
+      print('CNN model loaded successfully.');
+    } catch (e) {
+      print('Error loading CNN model: $e');
+    }
+
+    print('Loading SVM model...');
+    try {
+      await loadSvmModel();
+      print('SVM model loaded successfully.');
+    } catch (e) {
+      print('Error loading SVM model: $e');
+    }
+  }
+
+  Future<void> loadSvmModel() async {
+    try {
+      svmInterpreter =
+          await Interpreter.fromAsset('assets/model/v1_svm_model.tflite');
+    } catch (e) {
+      print('Error loading SVM interpreter: $e');
+    }
+  }
+
+  Future<List<int>> extractFeaturesFromCNN(File imageFile) async {
+    var imgBytes = await imageFile.readAsBytes();
+    var input = imgBytes.buffer.asUint8List();
+    var output = List.filled(
+        cnnInterpreter.getOutputTensor(0).shape.reduce((a, b) => a * b), 0);
+
+    cnnInterpreter.run(input, output);
+
+    print(output);
+
+    return output;
+  }
+
+  int classifyWithSvm(List<double> features) {
+    var input = features.map((e) => [e]).toList();
+    var output = List.filled(
+        svmInterpreter.getOutputTensor(0).shape.reduce((a, b) => a * b), 0);
+    svmInterpreter.run(input, output);
+
+    return output[0].round();
   }
 
   //This code will capture still image in front of the camera.
   void classifyStillImage() async {
-    if (cameraController!.value.isTakingPicture) return;
-    if (timer?.isActive == false)
-      setState(() {
-        isCapturing = true; // Set capturing flag to true during image capture
-      });
+    print('work1');
+    if (cameraController!.value.isTakingPicture || isInterpreting) return;
+    //if (timer?.isActive == false)
+    setState(() {
+      print('work2');
+
+      isCapturing = true; // Set capturing flag to true during image capture
+      isInterpreting = true;
+    });
     try {
       XFile imageFile = await cameraController!.takePicture();
       classifyImage(File(imageFile.path));
+      print('work3');
     } catch (e) {
       print('Error capturing image: $e');
     }
     setState(() {
       isCapturing = false; // Set capturing flag to false after image capture
     });
+
+    // Introduce a delay before the next classification
+    await Future.delayed(Duration(seconds: 2));
+    isInterpreting = false; // Reset the flag after the delay
+
     if (mounted) {
       // Delay for 3 seconds before the next classification
-      timer = Timer(Duration(seconds: 5), classifyStillImage);
+      timer = Timer(Duration(seconds: 20), classifyStillImage);
     }
   }
 
   //Based on the captured still image. This code will run through the image to the tflite model
   void classifyImage(File imageFile) async {
-    var recognitions = await Tflite.runModelOnImage(
-      path: imageFile.path,
-      numResults: 3, // Number of classification results to obtain
-      threshold: 0.5, // Confidence threshold for classification
-    );
-
-    if (recognitions != null && recognitions.isNotEmpty) {
-      for (var item in recognitions) {
-        final className = item['label'] as String;
-        final recommendation = await getRecommendationForClass(className);
-        item['recommendation'] = recommendation;
-      }
+    print('classifyImage called');
+    // Check if the interpreter is busy
+    while (isInterpreting) {
+      await Future.delayed(Duration(milliseconds: 100));
     }
+    try {
+      isInterpreting = true;
+      var recognitions = await Tflite.runModelOnImage(
+        path: imageFile.path,
+        numResults: 3,
+        threshold: 0.5,
+      );
 
-    setState(() {
       if (recognitions != null && recognitions.isNotEmpty) {
-        prediction = recognitions[0]['label'];
-        confidence = recognitions[0]['confidence'];
-        capturedImage = imageFile;
-        captureTime = DateTime.now();
-      } else {
-        prediction = 'Unknown';
-        confidence = null;
-        capturedImage = null;
-        captureTime = null;
+        for (var item in recognitions) {
+          final className = item['label'] as String;
+          final recommendation = await getRecommendationForClass(className);
+          item['recommendation'] = recommendation;
+        }
       }
-    });
+
+      setState(() {
+        if (recognitions != null && recognitions.isNotEmpty) {
+          prediction = recognitions[0]['label'];
+          confidence = recognitions[0]['confidence'];
+          capturedImage = imageFile;
+          captureTime = DateTime.now();
+        } else {
+          prediction = 'Unknown';
+          confidence = null;
+          capturedImage = null;
+          captureTime = null;
+        }
+      });
+
+      print('Image classified. Prediction: $prediction');
+      print('classifyImage completed');
+    } catch (e) {
+      print('Error classifying image: $e');
+    } finally {
+      isInterpreting = false;
+    }
+    print('classifyImage completed');
   }
 
   //Based on the classifed image and prediction. Recommendation of foliar fertilizer will be retrieve(recommendations.json) and displayed
@@ -389,14 +473,6 @@ class _CameraScreenState extends State<CameraScreen> {
         );
       },
     );
-  }
-
-  @override
-  void dispose() {
-    cameraController?.pausePreview();
-    timer?.cancel();
-    Tflite.close();
-    super.dispose();
   }
 
   @override

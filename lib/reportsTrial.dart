@@ -19,6 +19,7 @@ class _LineChartSampleState extends State<LineChartSample> {
   List<FlSpot> dataPoints = [];
   String selectedPrediction = 'nitrogen'; // Default prediction type
   String chartTitle = 'Nutrient Deficiency in Nitrogen';
+  int selectedYear = DateTime.now().year;
 
   @override
   void initState() {
@@ -39,7 +40,11 @@ class _LineChartSampleState extends State<LineChartSample> {
     CollectionReference collection =
         FirebaseFirestore.instance.collection('imageClassificationData');
 
-    QuerySnapshot querySnapshot = await collection.orderBy('captureTime').get();
+    QuerySnapshot querySnapshot = await collection
+        .orderBy('captureTime')
+        .where('captureTime', isGreaterThanOrEqualTo: '$selectedYear-01-01')
+        .where('captureTime', isLessThanOrEqualTo: '$selectedYear-12-31')
+        .get();
 
     int count = 0;
     int currentMonth = -1;
@@ -228,7 +233,7 @@ class _LineChartSampleState extends State<LineChartSample> {
                             ],
                           ),
                           SizedBox(
-                            height: 10,
+                            height: 8,
                           ),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -236,14 +241,14 @@ class _LineChartSampleState extends State<LineChartSample> {
                               Text(
                                 chartTitle,
                                 style: GoogleFonts.roboto(
-                                    color: Colors.black,
-                                    fontSize: 18.0,
+                                    color: Colors.grey[900],
+                                    fontSize: 20.0,
                                     fontWeight: FontWeight.bold),
                               )
                             ],
                           ),
                           SizedBox(
-                            height: 20,
+                            height: 5,
                           ),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -251,14 +256,77 @@ class _LineChartSampleState extends State<LineChartSample> {
                               Text(
                                 'Report as of ${getCurrentDate()}',
                                 style: GoogleFonts.roboto(
-                                    color: Colors.black,
+                                    color: Colors.grey[800],
                                     fontSize: 18.0,
                                     fontWeight: FontWeight.w400),
                               ),
                             ],
                           ),
                           SizedBox(
-                            height: 20,
+                            height: 10,
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(
+                                right: 25.0, bottom: 10.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                Container(
+                                  width: 140,
+                                  decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(10)),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        Icons.date_range_rounded,
+                                        color: Colors.green[900],
+                                      ),
+                                      Text('Filter',
+                                          style: GoogleFonts.roboto(
+                                              color: Colors.green[900],
+                                              fontSize: 15.0,
+                                              fontWeight: FontWeight.bold)),
+                                      SizedBox(
+                                        width: 8,
+                                      ),
+                                      // Add a dropdown or any other UI element to select the year
+                                      DropdownButton<int>(
+                                        value: selectedYear,
+                                        items: List.generate(
+                                          DateTime.now().year - 2022,
+                                          (index) => DropdownMenuItem<int>(
+                                            value: DateTime.now().year - index,
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                Text(
+                                                    '${DateTime.now().year - index}',
+                                                    style: GoogleFonts.roboto(
+                                                        color:
+                                                            Colors.green[900],
+                                                        fontSize: 15.0,
+                                                        fontWeight:
+                                                            FontWeight.bold)),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                        onChanged: (value) {
+                                          setState(() {
+                                            selectedYear = value!;
+                                            fetchDataFromFirestore();
+                                          });
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                           Container(
                             height: MediaQuery.of(context).size.height * 0.60,

@@ -2,12 +2,13 @@ import 'package:deficam/camscreen.dart';
 import 'package:deficam/dashboardScreen.dart';
 import 'package:deficam/historyScreen.dart';
 import 'package:deficam/reportsScreen.dart';
+import 'package:deficam/trial2.dart';
 import 'package:flutter/material.dart';
 import 'package:deficam/splashScreen.dart';
 import 'package:camera/camera.dart';
 import 'package:deficam/classifyScreen.dart';
 import 'package:firebase_core/firebase_core.dart';
-
+import 'package:deficam/trial.dart';
 import 'cameraclassify.dart';
 
 //List<CameraDescription> cameras = List.empty(growable: true);

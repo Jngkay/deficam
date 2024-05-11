@@ -18,6 +18,8 @@ class infoScreen extends StatefulWidget {
 class _infoScreenState extends State<infoScreen> {
   GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
   bool showTutorial = true;
+  bool showFacts = false;
+  bool showTrivia = false;
   CarouselController carouselController = CarouselController();
 
   Future<bool> _onWillPop() async {
@@ -52,6 +54,183 @@ class _infoScreenState extends State<infoScreen> {
         )) ??
         false;
   }
+
+  List<Widget> factWidgets = [
+    Container(
+      margin: EdgeInsets.all(6.0),
+      decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(8.0),
+          image: DecorationImage(
+            image: AssetImage("assets/facts/fact1.png"),
+            fit: BoxFit.fitHeight,
+          )),
+    ),
+    Container(
+      margin: EdgeInsets.all(6.0),
+      decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(8.0),
+          image: DecorationImage(
+            image: AssetImage("assets/facts/fact2.png"),
+            fit: BoxFit.fitHeight,
+          )),
+    ),
+  ];
+
+  List<Widget> tutorialWidgets = [
+    Container(
+      margin: EdgeInsets.all(6.0),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(8.0),
+        image: DecorationImage(
+          image: AssetImage("assets/tutorial/t1.png"),
+          fit: BoxFit.fitWidth,
+        ),
+      ),
+    ),
+    Container(
+      margin: EdgeInsets.all(6.0),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(8.0),
+        image: DecorationImage(
+          image: AssetImage("assets/tutorial/t2.png"),
+          fit: BoxFit.fitWidth,
+        ),
+      ),
+    ),
+    Container(
+      margin: EdgeInsets.all(6.0),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(8.0),
+        image: DecorationImage(
+          image: AssetImage("assets/tutorial/t3.png"),
+          fit: BoxFit.fitWidth,
+        ),
+      ),
+    ),
+    Container(
+      margin: EdgeInsets.all(6.0),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(8.0),
+        image: DecorationImage(
+          image: AssetImage("assets/tutorial/t4.png"),
+          fit: BoxFit.fitWidth,
+        ),
+      ),
+    ),
+    Container(
+      margin: EdgeInsets.all(6.0),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(8.0),
+        image: DecorationImage(
+          image: AssetImage("assets/tutorial/t5.png"),
+          fit: BoxFit.fitWidth,
+        ),
+      ),
+    ),
+    Container(
+      margin: EdgeInsets.all(6.0),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(8.0),
+        image: DecorationImage(
+          image: AssetImage("assets/tutorial/t6.png"),
+          fit: BoxFit.fitWidth,
+        ),
+      ),
+    ),
+    Container(
+      margin: EdgeInsets.all(6.0),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(8.0),
+        image: DecorationImage(
+          image: AssetImage("assets/tutorial/t7.png"),
+          fit: BoxFit.fitWidth,
+        ),
+      ),
+    ),
+  ];
+
+  List<Widget> triviawidgets = [
+    Container(
+      margin: EdgeInsets.all(6.0),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(8.0),
+        image: DecorationImage(
+          image: AssetImage("assets/trivia/trivia1.png"),
+          fit: BoxFit.fitWidth,
+        ),
+      ),
+    ),
+    Container(
+      margin: EdgeInsets.all(6.0),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(8.0),
+        image: DecorationImage(
+          image: AssetImage("assets/trivia/trivia2.png"),
+          fit: BoxFit.fitWidth,
+        ),
+      ),
+    ),
+    Container(
+      margin: EdgeInsets.all(6.0),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(8.0),
+        image: DecorationImage(
+          image: AssetImage("assets/trivia/trivia3.png"),
+          fit: BoxFit.fitWidth,
+        ),
+      ),
+    ),
+    Container(
+      margin: EdgeInsets.all(6.0),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(8.0),
+        image: DecorationImage(
+          image: AssetImage("assets/trivia/trivia4.png"),
+          fit: BoxFit.fitWidth,
+        ),
+      ),
+    ),
+    Container(
+      margin: EdgeInsets.all(6.0),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(8.0),
+        image: DecorationImage(
+          image: AssetImage("assets/trivia/trivia5.png"),
+          fit: BoxFit.fitWidth,
+        ),
+      ),
+    ),
+    Container(
+      margin: EdgeInsets.all(6.0),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(8.0),
+        image: DecorationImage(
+          image: AssetImage("assets/trivia/trivia6.png"),
+          fit: BoxFit.fitHeight,
+        ),
+      ),
+    ),
+    Container(
+      margin: EdgeInsets.all(6.0),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(8.0),
+        image: DecorationImage(
+          image: AssetImage("assets/trivia/trivia7.png"),
+          fit: BoxFit.fitHeight,
+        ),
+      ),
+    ),
+    Container(
+      margin: EdgeInsets.all(6.0),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(8.0),
+        image: DecorationImage(
+          image: AssetImage("assets/trivia/trivia8.png"),
+          fit: BoxFit.fitWidth,
+        ),
+      ),
+    ),
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -131,6 +310,8 @@ class _infoScreenState extends State<infoScreen> {
                                     onPressed: () {
                                       setState(() {
                                         showTutorial = true;
+                                        showFacts = false;
+                                        showTrivia = false;
                                       });
                                     },
                                     icon: Image.asset(
@@ -155,7 +336,9 @@ class _infoScreenState extends State<infoScreen> {
                                   ElevatedButton.icon(
                                     onPressed: () {
                                       setState(() {
+                                        showTrivia = true;
                                         showTutorial = false;
+                                        showFacts = false;
                                       });
                                     },
                                     icon: Image.asset(
@@ -165,6 +348,33 @@ class _infoScreenState extends State<infoScreen> {
                                     ),
                                     label: Text(
                                       'Trivia',
+                                      style: TextStyle(fontSize: 20),
+                                    ),
+                                    style: ElevatedButton.styleFrom(
+                                      foregroundColor:
+                                          Color.fromARGB(255, 0, 0, 0),
+                                      backgroundColor:
+                                          Color.fromARGB(255, 255, 255, 255),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(20),
+                                      ),
+                                    ),
+                                  ),
+                                  ElevatedButton.icon(
+                                    onPressed: () {
+                                      setState(() {
+                                        showFacts = true;
+                                        showTutorial = false;
+                                        showTrivia = false;
+                                      });
+                                    },
+                                    icon: Image.asset(
+                                      'assets/icons/symptoms.png',
+                                      width: 25,
+                                      height: 25,
+                                    ),
+                                    label: Text(
+                                      'Symptoms',
                                       style: TextStyle(fontSize: 20),
                                     ),
                                     style: ElevatedButton.styleFrom(
@@ -216,44 +426,7 @@ class _infoScreenState extends State<infoScreen> {
                                       ],
                                     ),
                                     CarouselSlider(
-                                      items: [
-                                        Container(
-                                          margin: EdgeInsets.all(6.0),
-                                          decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(8.0),
-                                            image: DecorationImage(
-                                              image: AssetImage(
-                                                  "assets/tutorial/dashboard.jpg"),
-                                              fit: BoxFit.fitHeight,
-                                            ),
-                                          ),
-                                        ),
-                                        Container(
-                                          margin: EdgeInsets.all(6.0),
-                                          decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(8.0),
-                                            image: DecorationImage(
-                                              image: AssetImage(
-                                                  "assets/tutorial/report.jpg"),
-                                              fit: BoxFit.fitHeight,
-                                            ),
-                                          ),
-                                        ),
-                                        Container(
-                                          margin: EdgeInsets.all(6.0),
-                                          decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(8.0),
-                                            image: DecorationImage(
-                                              image: AssetImage(
-                                                  "assets/tutorial/report.jpg"),
-                                              fit: BoxFit.fitHeight,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
+                                      items: tutorialWidgets,
                                       options: CarouselOptions(
                                         height:
                                             MediaQuery.of(context).size.height *
@@ -272,7 +445,10 @@ class _infoScreenState extends State<infoScreen> {
                                     // Add more tutorial content here
                                   ],
                                 ),
-                                replacement: Column(
+                              ),
+                              Visibility(
+                                visible: showTrivia,
+                                child: Column(
                                   children: [
                                     Row(
                                       mainAxisAlignment:
@@ -303,44 +479,61 @@ class _infoScreenState extends State<infoScreen> {
                                       ],
                                     ),
                                     CarouselSlider(
-                                      items: [
-                                        Container(
-                                          margin: EdgeInsets.all(6.0),
-                                          decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(8.0),
-                                            image: DecorationImage(
-                                              image: AssetImage(
-                                                  "assets/trivia/trivia1.png"),
-                                              fit: BoxFit.fitWidth,
-                                            ),
+                                      items: triviawidgets,
+                                      options: CarouselOptions(
+                                        height:
+                                            MediaQuery.of(context).size.height *
+                                                0.60,
+                                        enlargeCenterPage: true,
+                                        autoPlay: true,
+                                        aspectRatio: 16 / 9,
+                                        autoPlayCurve: Curves.fastOutSlowIn,
+                                        enableInfiniteScroll: true,
+                                        autoPlayAnimationDuration:
+                                            Duration(milliseconds: 800),
+                                        viewportFraction: 0.8,
+                                      ),
+                                      carouselController: carouselController,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              // Add a new Visibility widget for the fact carousel
+                              Visibility(
+                                visible: showFacts,
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        IconButton(
+                                          color: Colors.white,
+                                          icon: Icon(Icons.arrow_back_ios),
+                                          onPressed: () {
+                                            carouselController.previousPage();
+                                          },
+                                        ),
+                                        Text(
+                                          'Symptoms',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 30,
+                                            fontWeight: FontWeight.bold,
                                           ),
                                         ),
-                                        Container(
-                                          margin: EdgeInsets.all(6.0),
-                                          decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(8.0),
-                                            image: DecorationImage(
-                                              image: AssetImage(
-                                                  "assets/trivia/trivia2.png"),
-                                              fit: BoxFit.fitWidth,
-                                            ),
-                                          ),
-                                        ),
-                                        Container(
-                                          margin: EdgeInsets.all(6.0),
-                                          decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(8.0),
-                                            image: DecorationImage(
-                                              image: AssetImage(
-                                                  "assets/trivia/trivia3.png"),
-                                              fit: BoxFit.fitWidth,
-                                            ),
-                                          ),
+                                        IconButton(
+                                          color: Colors.white,
+                                          icon: Icon(Icons.arrow_forward_ios),
+                                          onPressed: () {
+                                            carouselController.nextPage();
+                                          },
                                         ),
                                       ],
+                                    ),
+                                    CarouselSlider(
+                                      items: factWidgets,
                                       options: CarouselOptions(
                                         height:
                                             MediaQuery.of(context).size.height *
@@ -392,120 +585,3 @@ class _infoScreenState extends State<infoScreen> {
     );
   }
 }
-
-
-/* 
-
- Column(
-                  children: [
-                    Container(
-                      child: OnBoardingSlider(
-                        headerBackgroundColor: Colors.white,
-                        finishButtonText: 'Explore',
-                        finishButtonStyle: FinishButtonStyle(
-                          backgroundColor: Colors.black,
-                        ),
-                        skipTextButton: Text('Skip'),
-                        background: [
-                          Image.asset('assets/splash.jpg'),
-                          Image.asset('assets/splash.jpg'),
-                          Image.asset('assets/splash.jpg'),
-                          Image.asset('assets/splash.jpg'),
-                        ],
-                        totalPage: 4,
-                        speed: 1.8,
-                        pageBodies: [
-                          Container(
-                            padding: EdgeInsets.symmetric(horizontal: 40),
-                            child: Column(
-                              children: <Widget>[
-                                SizedBox(
-                                  height: 200,
-                                ),
-                                Text('Description 1')
-                              ],
-                            ),
-                          ),
-                          Container(
-                            padding: EdgeInsets.symmetric(horizontal: 40),
-                            child: Column(
-                              children: <Widget>[
-                                SizedBox(
-                                  height: 200,
-                                ),
-                                Text('Description 2')
-                              ],
-                            ),
-                          ),
-                          Container(
-                            padding: EdgeInsets.symmetric(horizontal: 40),
-                            child: Column(
-                              children: <Widget>[
-                                SizedBox(
-                                  height: 200,
-                                ),
-                                Text('Description 3')
-                              ],
-                            ),
-                          ),
-                          Container(
-                            padding: EdgeInsets.symmetric(horizontal: 40),
-                            child: Column(
-                              children: <Widget>[
-                                SizedBox(
-                                  height: 200,
-                                ),
-                                Text('Description 4')
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-
-
-
-
-
-
-
-
-------------------------------------------------
-return Scaffold(
-      appBar: AppBar(
-        elevation: 0,
-        leading: GestureDetector(
-          onTap: () {
-            Navigator.pushReplacement(
-                context, MaterialPageRoute(builder: (_) => dashboardScreen()));
-          },
-          child: Image.asset('assets/logo/logo.png'),
-        ),
-        title: Text(
-          'Info',
-          style: TextStyle(
-            color: Colors.black,
-            fontSize: 30,
-          ),
-        ),
-        centerTitle: true,
-        backgroundColor: Colors.white,
-      ),
-      body: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  Color(0xFF88BF3B),
-                  Color(0xFF178F3E),
-                ]),
-            borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(25), topRight: Radius.circular(25)),
-          ),
-          
-    );
-
-*/

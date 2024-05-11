@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:camera/camera.dart';
+import 'package:deficam/backupClassify.dart';
 import 'package:deficam/cameraclassify.dart';
 import 'package:deficam/camscreen.dart';
 import 'package:deficam/classifyScreen.dart';
@@ -10,9 +11,12 @@ import 'package:deficam/main.dart';
 import 'package:deficam/reportsSample.dart';
 import 'package:deficam/reportsScreen.dart';
 import 'package:deficam/reportsTrial.dart';
+import 'package:deficam/trial2.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_exit_app/flutter_exit_app.dart';
+import 'package:deficam/cnnclassify.dart';
+import 'cnnclassify_working.dart';
 
 class dashboardScreen extends StatefulWidget {
   const dashboardScreen({super.key});
@@ -84,95 +88,6 @@ class _dashboardScreenState extends State<dashboardScreen> {
                               Image.asset('assets/icons/clouds1.png'),
                             ],
                           ),
-
-/*
-                          //Classify
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              Card(
-                                color: Colors.transparent,
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.only(
-                                  topLeft: Radius.circular(15),
-                                  bottomRight: Radius.circular(15),
-                                )),
-                                child: GestureDetector(
-                                  onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => CameraScreen(),
-                                      ),
-                                    );
-                                    /*
-                                    await availableCameras().then((value) =>
-                                        Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (context) =>
-                                                    classifyScreen(
-                                                        cameras: value))));*/
-                                  },
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      color: Color(0xFF1D9731),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color:
-                                              Color.fromARGB(255, 81, 81, 81),
-                                          blurRadius: 5,
-                                          offset:
-                                              Offset(2, 2), // Shadow position
-                                        ),
-                                      ],
-                                      borderRadius: BorderRadius.only(
-                                          topLeft: Radius.circular(15),
-                                          bottomRight: Radius.circular(15)),
-                                    ),
-                                    width: 280,
-                                    height: 150,
-                                    child: Row(
-                                      children: [
-                                        Column(
-                                          children: [
-                                            Container(
-                                              margin: EdgeInsets.fromLTRB(
-                                                  20, 35, 7, 0),
-                                              width: 60.0,
-                                              child: Image.asset(
-                                                  'assets/icons/classify_icon.png'),
-                                            ),
-                                            SizedBox(
-                                              height: 10,
-                                            ),
-                                            Text(
-                                              'Classify',
-                                              style: GoogleFonts.roboto(
-                                                  fontWeight: FontWeight.w500,
-                                                  fontSize: 18,
-                                                  color: Colors.white),
-                                            ),
-                                          ],
-                                        ),
-                                        SizedBox(
-                                          width: 130,
-                                        ),
-                                        Align(
-                                          alignment: Alignment.topRight,
-                                          child: Image.asset(
-                                              'assets/icons/cloudsBox.png'),
-                                        )
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                          
-*/
                           SizedBox(
                             height: 50,
                           ),
@@ -193,7 +108,13 @@ class _dashboardScreenState extends State<dashboardScreen> {
                                     Navigator.pushReplacement(
                                         context,
                                         MaterialPageRoute(
-                                            builder: (_) => CameraScreen()));
+                                            builder: (_) =>
+                                                Home())); //this is for the manual and gallery pick classify
+
+                                    //     Navigator.pushReplacement(
+                                    // context,
+                                    // MaterialPageRoute(
+                                    //     builder: (_) => Home())); //This is for the realtime classify
                                   },
                                   child: Container(
                                     decoration: BoxDecoration(
